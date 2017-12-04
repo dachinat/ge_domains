@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <style type="text/css">
+        body {
+            color: #2d527c;
+            font-family: MarkGEO-Regular;
+            font-size:16px;
+        }
+
+        h1 {
+            font-family: MarkGEOCAPS-Regular;
+        }
+
+        .btn {
+            border-radius: 5px;
+            padding: 15px 25px;
+            font-size: 22px;
+            text-decoration: none;
+            margin: 20px;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+        }
+        .btn:active {
+            transform: translate(0px, 5px);
+            -webkit-transform: translate(0px, 5px);
+            box-shadow: 0px 1px 0px 0px;
+        }
+        .blue {
+            background-color: #55acee;
+            box-shadow: 0px 5px 0px 0px #3C93D5;
+        }
+        .blue:hover {
+            background-color: #6FC6FF;
+        }
+
+        section {
+            font-family: MarkGEO-Regular;
+            margin-left: 22px;
+            font-size:16px;
+            background: #fff;
+            width: 420px;
+            height: 350px;
+            resize: none;
+            border: 2px dashed #2d527c;
+            outline: 0;
+        }
+
+        input {
+            width: 5px;
+            border: 0px;
+            outline: 0px;
+        }
+
+        select {
+            height: 60px;
+        }
+
+        @font-face {
+            font-family: MarkGEO-Regular;
+            src: url("./assets/fonts/MarkGEO-Regular.eot?#iefix") format("embedded-opentype"),
+            url("./assets/fonts/MarkGEO-Regular.woff") format("woff"),
+            url("./assets/fonts/MarkGEO-Regular.ttf") format("truetype"),
+            url("./assets/fonts/MarkGEO-Regular.svg#MarkGEO-Regular") format("svg");
+            font-weight:normal;
+            font-style:normal;
+        }
+
+        @font-face {
+            font-family: MarkGEOCAPS-Regular;
+            src: url("./assets/fonts/MarkGEOCAPS-Regular.eot?#iefix") format("embedded-opentype"),
+            url("./assets/fonts/MarkGEOCAPS-Regular.woff") format("woff"),
+            url("./assets/fonts/MarkGEOCAPS-Regular.ttf") format("truetype"),
+            url("./assets/fonts/MarkGEOCAPS-Regular.svg#MarkGEOCAPS-Regular") format("svg");
+            font-weight:normal;
+            font-style:normal;
+        }
+    </style>
+</head>
+<body>
+<h1>GE დომენების შემოწმება</h1>
+
+<div style="margin-top:45px;">
+    <section>
+        <input onkeypress="this.style.width = ((this.value.length + 1) * 8) + 'px';" />
+    </section>
+    <!--<div style="display:inline-block;vertical-align:top;margin-top:1px;line-height:22px;">-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+        <!--domain.ge<br/>-->
+    <!--</div>-->
+</div>
+
+<br/><br/>
+
+<a href="" class="btn blue">დამახსოვრება</a>
+<a href="" class="btn blue">შემოწმება</a>
+
+<select>
+    <option>ჯერ არაფერი დამახსოვრებულა</option>
+</select>
+
+<script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+    window.$ = window.jQuery = require('jquery');
+
+    $(document).on('keypress',"section input",function(e){
+        if (e.keyCode == 13){
+            $(this).after($(this).clone().val("")).after("<br/>");
+            $(this).next().next().focus();
+        }
+    });
+
+    $(document).on('keyup',"section input",function(e){
+        if (e.keyCode == 8){
+            if ($(this).get(0).selectionStart === 0) {
+                var prev = $(this).prev().prev()
+                prev.focus();
+                if ($(this).val() == "" && prev.length > 0) {
+                    $(this).prev().remove();
+                    $(this).remove();
+                }
+            }
+        } else if (e.keyCode == 38) {
+            $(this).prev().prev().focus();
+        } else if (e.keyCode == 40) {
+            $(this).next().next().focus();
+        }
+    });
+
+    $("section").on("click", function(e){
+        if (e.target !== this) {
+            return;
+        }
+
+       $(this).find("input").last().focus();
+    });
+
+    $(document).ready(function(){
+       $("input").focus();
+    });
+</script>
+
+</body>
+</html>

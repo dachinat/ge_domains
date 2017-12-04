@@ -1,0 +1,29 @@
+{
+  "name": "ge_domains",
+  "version": "1.0.0",
+  "description": "Check for multiple .GE domains at a time",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dachinat/ge_domains.git"
+  },
+  "keywords": [
+    "domains",
+    "ge"
+  ],
+  "author": "Dachi Natsvlishvili",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dachinat/ge_domains/issues"
+  },
+  "homepage": "https://github.com/dachinat/ge_domains#readme",
+  "devDependencies": {
+    "electron": "^1.7.9"
+  },
+  "dependencies": {
+    "jquery": "^3.2.1"
+  }
+}
