@@ -15,26 +15,60 @@
         }
 
         .btn {
-            border-radius: 5px;
-            padding: 15px 25px;
-            font-size: 22px;
-            text-decoration: none;
-            margin: 20px;
-            color: #fff;
-            position: relative;
-            display: inline-block;
-        }
+             border-radius: 5px;
+             padding: 15px 25px;
+             font-size: 22px;
+             text-decoration: none;
+             margin: 20px;
+             color: #fff;
+             position: relative;
+             display: inline-block;
+         }
         .btn:active {
             transform: translate(0px, 5px);
             -webkit-transform: translate(0px, 5px);
             box-shadow: 0px 1px 0px 0px;
         }
+
+        .btn_sm {
+            border-radius: 5px;
+            text-decoration: none;
+            position: relative;
+            display: inline-block;
+            font-size:13px;
+            margin:5px;
+            padding:10px 15px;
+        }
+        .btn_sm:active {
+            transform: translate(0px, 2px);
+            -webkit-transform: translate(0px, 2px);
+            box-shadow: 0px 1px 0px 0px;
+        }
+
         .blue {
             background-color: #55acee;
             box-shadow: 0px 5px 0px 0px #3C93D5;
         }
         .blue:hover {
             background-color: #6FC6FF;
+        }
+
+        .gray {
+            color:#7a7a7a;
+            background-color: #f9f9f9;
+            box-shadow: 0px 5px 0px 0px #d6d6d6;
+        }
+        .gray:hover {
+            background-color: #eeeeee;
+        }
+
+        .gray_sm {
+            color:#7a7a7a;
+            background-color: #f9f9f9;
+            box-shadow: 0px 2px 0px 0px #d6d6d6;
+        }
+        .gray_sm:hover {
+            background-color: #eeeeee;
         }
 
         section {
@@ -47,12 +81,21 @@
             resize: none;
             border: 2px dashed #2d527c;
             outline: 0;
+            overflow-y:auto;
+        }
+
+        section div {
+            border-bottom: 1px dashed #2d527c;
         }
 
         input {
+            padding:5px;
+            font-family: MarkGEO-Regular;
+            font-size:15px;
             width: 5px;
             border: 0px;
             outline: 0px;
+            max-width:270px;
         }
 
         select {
@@ -85,7 +128,7 @@
 
 <div style="margin-top:45px;">
     <section>
-        <input onkeypress="this.style.width = ((this.value.length + 1) * 8) + 'px';" />
+        <input onkeydown="this.style.width = ((this.value.length + 1) * 8.7) + 'px';" />
     </section>
     <!--<div style="display:inline-block;vertical-align:top;margin-top:1px;line-height:22px;">-->
         <!--domain.ge<br/>-->
@@ -99,14 +142,16 @@
     <!--</div>-->
 </div>
 
+<div style="margin-left:67px;margin-top:10px;">
+    <a href="#" class="btn_sm gray_sm">კოპირება</a>
+    <a href="#" class="btn_sm gray_sm">ჩასმა</a>
+    <a href="#" class="btn_sm gray_sm">გასუფთავება</a>
+</div>
+
 <br/><br/>
 
-<a href="" class="btn blue">დამახსოვრება</a>
-<a href="" class="btn blue">შემოწმება</a>
-
-<select>
-    <option>ჯერ არაფერი დამახსოვრებულა</option>
-</select>
+<a href="#" class="btn gray">დამახსოვრება</a>
+<a href="#" class="btn blue">შემოწმება</a>
 
 <script>
     // You can also require other files to run in this process
@@ -114,8 +159,8 @@
     window.$ = window.jQuery = require('jquery');
 
     $(document).on('keypress',"section input",function(e){
-        if (e.keyCode == 13){
-            $(this).after($(this).clone().val("")).after("<br/>");
+        if (e.keyCode == 13 && $(this).val().length > 0){
+            $(this).after($(this).clone().val("")).after("<div/>");
             $(this).next().next().focus();
         }
     });
@@ -144,6 +189,7 @@
 
        $(this).find("input").last().focus();
     });
+
 
     $(document).ready(function(){
        $("input").focus();
