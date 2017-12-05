@@ -22,7 +22,7 @@ function createWindow () {
         fullscreenable: false,
         title: "GE დომენები",
         icon: path.join(__dirname, 'ge_domains.png'), // ?
-        show: false
+        show: true //false (ready-to-show)
     })
 
     // and load the index.html of the app.
@@ -47,6 +47,22 @@ function createWindow () {
         mainWindow.show();
         mainWindow.focus();
     })
+
+    /* Child */
+
+    // let child = new BrowserWindow({
+    //     parent: mainWindow,
+    //     modal: true,
+    //     width: 300,
+    //     height: 300,
+    //     show: true
+    // })
+    //
+    //
+    // child.loadURL('file://' + __dirname + '/history.html')
+    // child.once('ready-to-show', () => {
+    //     child.show()
+    // })
 }
 
 // This method will be called when Electron has finished

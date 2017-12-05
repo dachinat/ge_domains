@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
 
+    <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css"/>
+
     <style type="text/css">
         body {
             color: #2d527c;
@@ -88,6 +90,10 @@
             border-bottom: 1px dashed #2d527c;
         }
 
+        section span {
+            float: right;
+        }
+
         input {
             padding:5px;
             font-family: MarkGEO-Regular;
@@ -142,10 +148,11 @@
     <!--</div>-->
 </div>
 
-<div style="margin-left:67px;margin-top:10px;">
-    <a href="#" class="btn_sm gray_sm">კოპირება</a>
-    <a href="#" class="btn_sm gray_sm">ჩასმა</a>
-    <a href="#" class="btn_sm gray_sm">გასუფთავება</a>
+<div style="margin-left:22px;margin-top:10px;">
+    <a data-toggle="history" href="#" class="btn_sm gray_sm"><i class="fa fa-history"></i></a>
+    <a href="#" class="btn_sm gray_sm"><i class="fa fa-copy"></i> კოპირება</a>
+    <a href="#" class="btn_sm gray_sm"><i class="fa fa-paste"></i> ჩასმა</a>
+    <a href="#" class="btn_sm gray_sm"><i class="fa fa-remove"></i> გასუფთავება</a>
 </div>
 
 <br/><br/>
@@ -160,25 +167,26 @@
 
     $(document).on('keypress',"section input",function(e){
         if (e.keyCode == 13 && $(this).val().length > 0){
-            $(this).after($(this).clone().val("")).after("<div/>");
-            $(this).next().next().focus();
+            $(this).after($(this).clone().val("")).after("<div/>").after("<span>12</span>");
+            $(this).next().next().next().focus();
         }
     });
 
     $(document).on('keyup',"section input",function(e){
-        if (e.keyCode == 8){
+        if (e.keyCode == 8) { // backspace
             if ($(this).get(0).selectionStart === 0) {
-                var prev = $(this).prev().prev()
+                var prev = $(this).prev().prev().prev();
                 prev.focus();
                 if ($(this).val() == "" && prev.length > 0) {
+                    $(this).prev().prev().remove();
                     $(this).prev().remove();
                     $(this).remove();
                 }
             }
-        } else if (e.keyCode == 38) {
-            $(this).prev().prev().focus();
+        } else if (e.keyCode == 38) { // up
+            $(this).prev().prev().prev().focus();
         } else if (e.keyCode == 40) {
-            $(this).next().next().focus();
+            $(this).next().next().next().focus();
         }
     });
 
@@ -193,6 +201,41 @@
 
     $(document).ready(function(){
        $("input").focus();
+    });
+
+    $.ajax({
+        url: 'http://nic.net.ge/Home/DomainCheck',
+        type: 'post',
+        data: {
+            "Domain": "peer",
+            "TopLevelDomain": ".ge"
+        },
+        headers: {
+            "X-Requested-With": 'XMLHttpRequest'
+        },
+        success: function (data) {
+            console.info(data);
+        }
+    });
+
+    $("[data-toggle=history]").click(function(){
+        const remote = require('electron').remote;
+        const BrowserWindow = remote.BrowserWindow;
+
+        var win = new BrowserWindow({
+            parent: remote.getCurrentWindow(),
+            modal: true,
+            width: 300,
+            height: 500,
+            show: false,
+            backgroundColor: '#fffff'
+        });
+
+        win.loadURL('file://' + __dirname + '/history.html')
+        win.once('ready-to-show', () => {
+            win.show()
+            win.focus()
+        });
     });
 </script>
 
