@@ -237,6 +237,13 @@
             win.focus()
         });
     });
+
+    const ipc = require('electron').ipcRenderer
+
+    ipc.on('load-version', function(arg2, arg) {
+        $("section").text(arg);
+        console.log(arg);
+    });
 </script>
 
 </body>

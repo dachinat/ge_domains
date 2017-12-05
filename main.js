@@ -4,6 +4,8 @@ const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
+const ipc = require('electron').ipcMain
+
 const path = require('path')
 const url = require('url')
 
@@ -33,7 +35,7 @@ function createWindow () {
     }))
 
     //Open the DevTools.
-    //mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -63,6 +65,11 @@ function createWindow () {
     // child.once('ready-to-show', () => {
     //     child.show()
     // })
+
+
+    ipc.on('load-version', function(event, arg) {
+        mainWindow.webContents.send('load-version', arg);
+    });
 }
 
 // This method will be called when Electron has finished

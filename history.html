@@ -67,10 +67,25 @@
 <h4>აირჩიეთ ჩანაწერი</h4>
 
 <div style="margin:15px;background:#fff;">
+
+    <a href="#">test</a>
+
     <div style="text-align:center;">
         <a href="javascript:window.close();" class="btn_sm blue_sm">დახურვა</a>
     </div>
 </div>
+
+
+<script>
+    window.$ = window.jQuery = require('jquery');
+
+    const ipc = require('electron').ipcRenderer
+
+    $("a").click(function(){
+        ipc.send('load-version', 'test');
+        window.close();
+    });
+</script>
 
 </body>
 </html>
