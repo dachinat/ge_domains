@@ -40,6 +40,26 @@
             background-color: #6FC6FF;
         }
 
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            height: 340px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        li {
+            margin-bottom:5px;
+            padding-bottom:3px;
+            border-bottom: 2px dashed #2d527c;
+        }
+        li a {
+            text-decoration: none;
+            color: #000;
+            display: block;
+            width: 200px;
+        }
+
 
         @font-face {
             font-family: MarkGEO-Regular;
@@ -68,10 +88,11 @@
 
 <div style="margin:15px;background:#fff;">
 
-    <a href="#">test</a>
+    <ul>
+    </ul>
 
     <div style="text-align:center;">
-        <a href="javascript:window.close();" class="btn_sm blue_sm">დახურვა</a>
+        <a href="javascript:window.close();" class="btn_sm blue_sm">დაბრუნება</a>
     </div>
 </div>
 
@@ -81,10 +102,29 @@
 
     const ipc = require('electron').ipcRenderer
 
-    $("a").click(function(){
-        ipc.send('load-version', 'test');
+    $(document).on("click", 'a[href="#"]', function(event){
+        ipc.send('load-version', $.trim($(this).text()));
         window.close();
     });
+
+    const os = require('os');
+    const storage = require('electron-json-storage');
+
+    storage.setDataPath(os.tmpdir() + '/ge_domains');
+
+    storage.getAll(function(error, data) {
+        if (error) throw error;
+
+        if ($.isEmptyObject(data)) {
+            window.close();
+            return;
+        }
+
+        $.each(data, function(i){
+            $("<a>").attr("href","#").html('<i class="fa fa-file-o"></i> ' + i).appendTo($("<li/>").appendTo($("ul")));
+        });
+    });
+
 </script>
 
 </body>

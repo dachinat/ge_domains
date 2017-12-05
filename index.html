@@ -143,7 +143,7 @@
 
 <div style="margin-top:45px;">
     <section>
-        <input onkeydown="this.style.width = ((this.value.length + 1) * 8.7) + 'px';" />
+        <input />
     </section>
     <!--<div style="display:inline-block;vertical-align:top;margin-top:1px;line-height:22px;">-->
         <!--domain.ge<br/>-->
@@ -178,7 +178,8 @@
     const SEC_LIMIT = 120; // Seconds to keep records in memory
 
     $(document).on('keypress',"section input",function(e){
-        if (e.keyCode == 13 && $(this).val().length > 0){
+        if (e.keyCode == 13 && $(this).val().length > 1){
+            $(this).next().remove(); // remove status (if possible), will be inserted with next lien
             $(this).after($(this).clone().val("")).after("<div/>").after("<span></span>");
             $(this).next().next().next().focus();
             checkDomain($(this));
@@ -207,6 +208,13 @@
         }
     });
 
+    function setInputWidth(input) {
+        $(input).css("width", (($(input).val().length + 1) * 8.7) + 'px');
+    }
+    $(document).on('keydown',"section input",function(e){
+       setInputWidth($(this));
+    });
+
     $("section").on("click", function(e){
         if (e.target !== this) {
             return;
@@ -216,14 +224,21 @@
     });
 
 
+    var original_input;
     $(document).ready(function(){
        $("input").focus();
+       original_input = $("input")
     });
+
 
     //
     var store = {}
     function checkDomain(input) {
         var domain = input.val();
+
+        if (domain.length < 2) {
+            return;
+        }
 
         var match = domain.match(/(.+)\.ge$/)
         if (match !== null) {
@@ -263,21 +278,11 @@
     }
 
     $("#check").on("click", function(){
-        $.ajax({
-            url: 'http://nic.net.ge/Home/DomainCheck',
-            type: 'post',
-            data: {
-                "Domain": "peer",
-                "TopLevelDomain": ".ge"
-            },
-            headers: {
-                "X-Requested-With": 'XMLHttpRequest'
-            },
-            success: function (data, textStatus, jqXHR) {
-                var taken = /დაკავებულია/.test(data['Data']);
-
-
+        $("input").each(function(i, el){
+            if ($(el).val().length < 2) {
+                return;
             }
+            checkDomain($(el));
         });
     });
 
@@ -304,12 +309,23 @@
 
     const ipc = require('electron').ipcRenderer
 
-    ipc.on('load-version', function(arg2, arg) {
-        $("section").text(arg);
-        console.log(arg);
-    });
+    ipc.on('load-version', function(arg, val) {
+        storage.get(val, function(error, data) {
+            if (error) throw error;
 
-    //
+            data = JSON.parse(data);
+
+            if ($.isEmptyObject(data)) {
+                return;
+            }
+
+            $("section").text("");
+            $.each(data, function(i, v) {
+                var input = original_input.clone().val(v).appendTo("section").after("<div/>").after("<span></span>");
+                setInputWidth(input);
+            });
+        });
+    });
 
     const os = require('os');
     const storage = require('electron-json-storage');
@@ -317,17 +333,28 @@
     storage.setDataPath(os.tmpdir() + '/ge_domains');
 
     $("#save").on("click", function(e){
-        var all = Array.from($('input').filter((i, el) => !!$(el).val()).map((i, el) => $(el).val()));
+        var all = Array.from($('input').filter((i, el) => $(el).val().length > 1).map((i, el) => $(el).val()));
         if (all.length == 0) {
             return;
         }
 
         var json = JSON.stringify(all);
-        var date = +new Date();
+
+        var date = new Date();
+        date = [
+            '0' + date.getDate(),
+            '0' + (date.getMonth() + 1),
+            '' + date.getFullYear(),
+            '0' + date.getHours(),
+            '0' + date.getMinutes(),
+            '0' + date.getSeconds()
+        ].map(component => component.slice(-2));
+
+        console.log(date);
+
+        date = date.slice(0, 3).join('-') + ' ' + date.slice(3).join(':');
 
         storage.set('' + date, json);
-
-        console.log(storage.getDataPath());
 
         e.preventDefault();
     });
