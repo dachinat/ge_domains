@@ -5,6 +5,7 @@
 
     <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css"/>
 
+    <title>.GE დომენები</title>
     <style type="text/css">
         body {
             color: #2d527c;
@@ -18,10 +19,10 @@
 
         .btn {
              border-radius: 5px;
-             padding: 15px 25px;
+             padding: 15px 15px;
              font-size: 22px;
              text-decoration: none;
-             margin: 20px;
+             margin: 7px;
              color: #fff;
              position: relative;
              display: inline-block;
@@ -29,21 +30,6 @@
         .btn:active {
             transform: translate(0px, 5px);
             -webkit-transform: translate(0px, 5px);
-            box-shadow: 0px 1px 0px 0px;
-        }
-
-        .btn_sm {
-            border-radius: 5px;
-            text-decoration: none;
-            position: relative;
-            display: inline-block;
-            font-size:13px;
-            margin:5px;
-            padding:10px 15px;
-        }
-        .btn_sm:active {
-            transform: translate(0px, 2px);
-            -webkit-transform: translate(0px, 2px);
             box-shadow: 0px 1px 0px 0px;
         }
 
@@ -61,15 +47,6 @@
             box-shadow: 0px 5px 0px 0px #d6d6d6;
         }
         .gray:hover {
-            background-color: #eeeeee;
-        }
-
-        .gray_sm {
-            color:#7a7a7a;
-            background-color: #f9f9f9;
-            box-shadow: 0px 2px 0px 0px #d6d6d6;
-        }
-        .gray_sm:hover {
             background-color: #eeeeee;
         }
 
@@ -136,6 +113,15 @@
         .text-red {
             color: #ce594e;
         }
+
+        #main-actions a {
+            display: inline;
+        }
+
+        #main-actions {
+            margin-left: 8px;
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
@@ -145,29 +131,13 @@
     <section>
         <input />
     </section>
-    <!--<div style="display:inline-block;vertical-align:top;margin-top:1px;line-height:22px;">-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-        <!--domain.ge<br/>-->
-    <!--</div>-->
 </div>
 
-<div style="margin-left:22px;margin-top:10px;">
-    <a data-toggle="history" href="#" class="btn_sm gray_sm"><i class="fa fa-history"></i></a>
-    <a href="#" class="btn_sm gray_sm"><i class="fa fa-copy"></i> კოპირება</a>
-    <a href="#" class="btn_sm gray_sm"><i class="fa fa-paste"></i> ჩასმა</a>
-    <a href="#" class="btn_sm gray_sm"><i class="fa fa-remove"></i> გასუფთავება</a>
+<div id="main-actions">
+    <a data-toggle="history" href="#" class="btn gray"><i class="fa fa-history"></i></a>
+    <a id="save" href="#" class="btn gray">დამახსოვრება</a>
+    <a id="check" href="#" class="btn blue">შემოწმება</a>
 </div>
-
-<br/><br/>
-
-<a id="save" href="#" class="btn gray">დამახსოვრება</a>
-<a id="check" href="#" class="btn blue">შემოწმება</a>
 
 <script>
     "use strict";
@@ -179,7 +149,7 @@
 
     $(document).on('keypress',"section input",function(e){
         if (e.keyCode == 13 && $(this).val().length > 1){
-            $(this).next().remove(); // remove status (if possible), will be inserted with next lien
+            $(this).next().remove(); // remove status (if possible), will be inserted with next line (erase, return)
             $(this).after($(this).clone().val("")).after("<div/>").after("<span></span>");
             $(this).next().next().next().focus();
             checkDomain($(this));
@@ -209,7 +179,7 @@
     });
 
     function setInputWidth(input) {
-        $(input).css("width", (($(input).val().length + 1) * 8.7) + 'px');
+        $(input).css("width", (($(input).val().length + 1) * 9.7) + 'px');
     }
     $(document).on('keydown',"section input",function(e){
        setInputWidth($(this));
@@ -255,7 +225,11 @@
             delete store[domain];
         }
 
+
         input.next().text("მოწმდება...")
+
+        store[domain] = [+new Date(), '<span class="text-blue">თავისუფალია</span>'];
+        return;
 
         $.ajax({
             url: 'http://nic.net.ge/Home/DomainCheck',
@@ -278,32 +252,51 @@
     }
 
     $("#check").on("click", function(){
+        var check = 0;
         $("input").each(function(i, el){
             if ($(el).val().length < 2) {
+                console.log("<2");
                 return;
             }
+
+            $(this).next().remove();
+            $(this).after("<span></span>");
+
             checkDomain($(el));
+            check = 1;
         });
+        if (check === 0) {
+            ipc.send('open-error-dialog-check')
+        }
     });
 
+
     //
+
+    const remote = require('electron').remote;
+    const BrowserWindow = remote.BrowserWindow;
+
     $("[data-toggle=history]").click(function(){
-        const remote = require('electron').remote;
-        const BrowserWindow = remote.BrowserWindow;
+        storage.getAll(function(error, data) {
+            if (error) throw error;
+            if ($.isEmptyObject(data)) {
+                ipc.send('open-error-dialog-history')
+            } else {
+                var win = new BrowserWindow({
+                    parent: remote.getCurrentWindow(),
+                    modal: true,
+                    width: 300,
+                    height: 500,
+                    show: false,
+                    backgroundColor: '#fffff'
+                });
 
-        var win = new BrowserWindow({
-            parent: remote.getCurrentWindow(),
-            modal: true,
-            width: 300,
-            height: 500,
-            show: false,
-            backgroundColor: '#fffff'
-        });
-
-        win.loadURL('file://' + __dirname + '/history.html')
-        win.once('ready-to-show', () => {
-            win.show()
-            win.focus()
+                win.loadURL('file://' + __dirname + '/history.html')
+                win.once('ready-to-show', () => {
+                    win.show()
+                win.focus()
+            });
+            }
         });
     });
 

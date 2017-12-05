@@ -9,9 +9,27 @@ const ipc = require('electron').ipcMain
 const path = require('path')
 const url = require('url')
 
-// DB
+const dialog = require('electron').dialog
 
+ipc.on('open-error-dialog-check', function (event) {
+    dialog.showErrorBox('შეცდომა', 'შესამოწმებლად დომენები არაა მოცემული.')
+})
 
+ipc.on('open-error-dialog-history', function (event) {
+    dialog.showErrorBox('შეცდომა', 'ისტორიაში ჯერ ჩანაწერები არ დამატებულა.')
+})
+
+ipc.on('open-confirm-dialog-history', function (event, args) {
+    const options = {
+        type: 'info',
+        title: 'დადასტურება',
+        message: "ნამდვილად გსურთ ამ შენატანის გაუქმება?",
+        buttons: ['კი', 'არა']
+    }
+    dialog.showMessageBox(options, function (index) {
+        event.sender.send('confirm-dialog-selection-history', [index, args])
+    })
+})
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -21,7 +39,7 @@ function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 500,
-        height: 685,
+        height: 620,
         backgroundColor: '#cee8fa',
         resizable: false,
         maximizable: false,
