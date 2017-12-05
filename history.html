@@ -56,8 +56,10 @@
         li a {
             text-decoration: none;
             color: #000;
-            display: block;
-            width: 200px;
+        }
+
+        li a.txt-red {
+            color: #ce594e;
         }
 
 
@@ -107,6 +109,15 @@
         window.close();
     });
 
+    $(document).on("click", 'a[href="#delete"]', function(event){
+        $(this).parent().remove();
+
+        var key = $.trim($(this).parent().text());
+        storage.remove(key, function(error) {
+            if (error) throw error;
+        });
+    });
+
     const os = require('os');
     const storage = require('electron-json-storage');
 
@@ -121,7 +132,7 @@
         }
 
         $.each(data, function(i){
-            $("<a>").attr("href","#").html('<i class="fa fa-file-o"></i> ' + i).appendTo($("<li/>").appendTo($("ul")));
+            $("<a>").attr("href","#").html('<i class="fa fa-file-o"></i> ' + i).appendTo($("<li/>").appendTo($("ul"))).before('<a class="txt-red" href="#delete" style="float:right;"><i class="fa fa-remove"></i></a>');
         });
     });
 
