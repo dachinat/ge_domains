@@ -92,6 +92,8 @@
 
         section span {
             float: right;
+            padding-right:5px;
+            padding-top:1px;
         }
 
         input {
@@ -127,6 +129,13 @@
             font-weight:normal;
             font-style:normal;
         }
+
+        .text-blue {
+            color: #2d527c;
+        }
+        .text-red {
+            color: #ce594e;
+        }
     </style>
 </head>
 <body>
@@ -157,18 +166,22 @@
 
 <br/><br/>
 
-<a href="#" class="btn gray">დამახსოვრება</a>
-<a href="#" class="btn blue">შემოწმება</a>
+<a id="save" href="#" class="btn gray">დამახსოვრება</a>
+<a id="check" href="#" class="btn blue">შემოწმება</a>
 
 <script>
+    "use strict";
     // You can also require other files to run in this process
     require('./renderer.js')
     window.$ = window.jQuery = require('jquery');
 
+    const SEC_LIMIT = 120; // Seconds to keep records in memory
+
     $(document).on('keypress',"section input",function(e){
         if (e.keyCode == 13 && $(this).val().length > 0){
-            $(this).after($(this).clone().val("")).after("<div/>").after("<span>12</span>");
+            $(this).after($(this).clone().val("")).after("<div/>").after("<span></span>");
             $(this).next().next().next().focus();
+            checkDomain($(this));
         }
     });
 
@@ -178,10 +191,14 @@
                 var prev = $(this).prev().prev().prev();
                 prev.focus();
                 if ($(this).val() == "" && prev.length > 0) {
-                    $(this).prev().prev().remove();
+                    // don't remove status
+                    //$(this).prev().prev().remove();
                     $(this).prev().remove();
                     $(this).remove();
                 }
+            } else if ($(this).get(0).selectionStart === $(this).val().length) {
+                // clear status
+                $(this).next().text("");
             }
         } else if (e.keyCode == 38) { // up
             $(this).prev().prev().prev().focus();
@@ -203,21 +220,68 @@
        $("input").focus();
     });
 
-    $.ajax({
-        url: 'http://nic.net.ge/Home/DomainCheck',
-        type: 'post',
-        data: {
-            "Domain": "peer",
-            "TopLevelDomain": ".ge"
-        },
-        headers: {
-            "X-Requested-With": 'XMLHttpRequest'
-        },
-        success: function (data) {
-            console.info(data);
+    //
+    var store = {}
+    function checkDomain(input) {
+        var domain = input.val();
+
+        var match = domain.match(/(.+)\.ge$/)
+        if (match !== null) {
+            domain = match[1];
         }
+
+        if (store.hasOwnProperty(domain)) {
+            var now = new Date().getTime();
+
+            if (Math.floor((now - store[domain][0]) / 1000) <= SEC_LIMIT) {
+                input.next().html(store[domain][1]);
+                return;
+            }
+            delete store[domain];
+        }
+
+        input.next().text("მოწმდება...")
+
+        $.ajax({
+            url: 'http://nic.net.ge/Home/DomainCheck',
+            type: 'post',
+            data: {
+                "Domain": domain,
+                "TopLevelDomain": ".ge"
+            },
+            headers: {
+                "X-Requested-With": 'XMLHttpRequest'
+            },
+            success: function (data, textStatus, jqXHR) {
+                var msg = /დაკავებულია/.test(data['Data']) ?
+                    '<span class="text-red">დაკავებულია</span>' : '<span class="text-blue">თავისუფალია</span>';
+                input.next().html(msg);
+
+                store[domain] = [+new Date(), msg];
+            }
+        });
+    }
+
+    $("#check").on("click", function(){
+        $.ajax({
+            url: 'http://nic.net.ge/Home/DomainCheck',
+            type: 'post',
+            data: {
+                "Domain": "peer",
+                "TopLevelDomain": ".ge"
+            },
+            headers: {
+                "X-Requested-With": 'XMLHttpRequest'
+            },
+            success: function (data, textStatus, jqXHR) {
+                var taken = /დაკავებულია/.test(data['Data']);
+
+
+            }
+        });
     });
 
+    //
     $("[data-toggle=history]").click(function(){
         const remote = require('electron').remote;
         const BrowserWindow = remote.BrowserWindow;
@@ -243,6 +307,29 @@
     ipc.on('load-version', function(arg2, arg) {
         $("section").text(arg);
         console.log(arg);
+    });
+
+    //
+
+    const os = require('os');
+    const storage = require('electron-json-storage');
+
+    storage.setDataPath(os.tmpdir() + '/ge_domains');
+
+    $("#save").on("click", function(e){
+        var all = Array.from($('input').filter((i, el) => !!$(el).val()).map((i, el) => $(el).val()));
+        if (all.length == 0) {
+            return;
+        }
+
+        var json = JSON.stringify(all);
+        var date = +new Date();
+
+        storage.set('' + date, json);
+
+        console.log(storage.getDataPath());
+
+        e.preventDefault();
     });
 </script>
 
