@@ -19,47 +19,47 @@ $(document).on('keypress', 'section input',function(e){
         if ($(this).val().length < 2 || !/^[A-Za-z0-9\-\.]+$/.test($(this).val())) {
             return;
         }
-        original_input.clone().val("").appendTo($(this).parent().parent()).wrap('<div/>').after('<span/>').focus();
+        original_input.clone().val('').appendTo($(this).parent().parent()).wrap('<div/>').after('<span/>').focus();
         checkDomain($(this));
     }
 });
 
-$(document).on('keyup',"section input",function(e){
+$(document).on('keyup','section input',function(e){
     // When backspace is pressed in input
     if (e.keyCode == 8) {
         // When caret is in the beginning of input
         if ($(this).get(0).selectionStart === 0) {
 
             // Focus on previous input
-            $(this).parent().prev().find("input").focus();
+            $(this).parent().prev().find('input').focus();
 
             // Delete surrunding divs for all except first input
-            if ($(this).val() == "" && $($(this).parent().parent().children()).length > 1) {
+            if ($(this).val() == '' && $($(this).parent().parent().children()).length > 1) {
                 $(this).parent().remove();
             }
             // When caret is in the end of input
         } else if ($(this).get(0).selectionStart === $(this).val().length) {
             // Clear status
-            $(this).next().text("");
+            $(this).next().text('');
         }
         // When up-key is pressed in input
     } else if (e.keyCode == 38) {
         // Focus on parent input
-        $(this).parent().prev().find("input").focus();
+        $(this).parent().prev().find('input').focus();
         // When down-key is pressed in input
     } else if (e.keyCode == 40) {
         // Focus on child input
-        $(this).parent().next().find("input").focus();
+        $(this).parent().next().find('input').focus();
     }
 });
 
 // Focus on input on nearby clicks
-$(document).on("click", "section, section div", function(e) {
+$(document).on('click', 'section, section div', function(e) {
     if (e.target !== this) {
         return;
     }
 
-    $(this).find("input").last().focus();
+    $(this).find('input').last().focus();
 });
 
 // Domain check function
@@ -86,17 +86,17 @@ function checkDomain(input) {
         delete store[domain];
     }
 
-    input.next().text("მოწმდება...")
+    input.next().text('მოწმდება...')
 
     $.ajax({
         url: 'http://nic.net.ge/Home/DomainCheck',
         type: 'post',
         data: {
-            "Domain": domain,
-            "TopLevelDomain": ".ge"
+            'Domain': domain,
+            'TopLevelDomain': '.ge'
         },
         headers: {
-            "X-Requested-With": 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest'
         },
         success: function (data, textStatus, jqXHR) {
             var msg = /დაკავებულია/.test(data['Data']) ?
@@ -111,16 +111,15 @@ function checkDomain(input) {
 }
 
 // When check button is clicked
-$("#check").on("click", function(){
+$('#check').on('click', function(){
     var check = 0;
-    $("input").each(function(i, el){
+    $('input').each(function(i, el){
         if ($(el).val().length < 2) {
-            console.log("<2");
             return;
         }
 
         $(this).next().remove();
-        $(this).after("<span></span>");
+        $(this).after('<span></span>');
 
         checkDomain($(el));
         check = 1;
@@ -131,7 +130,7 @@ $("#check").on("click", function(){
 });
 
 // When copy button is clicked
-$("#copy").click(function(){
+$('#copy').click(function(){
     var text = Array.from(
         $('input').filter(
             (i, el) => $(el).val().length > 1
@@ -139,7 +138,7 @@ $("#copy").click(function(){
             (i, el) => {
                 var domain = $(el).val();
                 if (!/.+\.ge$/.test(domain)) {
-                    domain += ".ge";
+                    domain += '.ge';
                 }
 
                 var status = $(el).next().text()
@@ -150,25 +149,25 @@ $("#copy").click(function(){
     ).join("\n");
 
     if (text.length == 0) {
-        ipc.send("open-error-dialog-copy");
+        ipc.send('open-error-dialog-copy');
         return;
     }
 
     clipboard.writeText(text);
-    ipc.send("open-message-dialog-copy");
+    ipc.send('open-message-dialog-copy');
 });
 
 // When paste button is clicked
-$("#paste").click(function(){
+$('#paste').click(function(){
     var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
 
     if (domains === null || domains.length == 0) {
         return;
     }
 
-    $("section").text("");
+    $('section').text('');
     $.each(domains, function(i, v) {
-        var input = original_input.clone().val(v).appendTo("section").wrap("<div/>").after("<span/>");
+        var input = original_input.clone().val(v).appendTo('section').wrap('<div/>').after('<span/>');
 
         setInputWidth(input);
     });
@@ -176,13 +175,13 @@ $("#paste").click(function(){
 
 // When clear button is clicked
 
-$("#clear").click(function(){
-    $("section").text("");
-    original_input.clone().val("").appendTo("section").wrap("<div/>").after("<span/>").focus();
+$('#clear').click(function(){
+    $('section').text('');
+    original_input.clone().val('').appendTo('section').wrap('<div/>').after('<span/>').focus();
 });
 
 // When history butotn is clciked
-$("[data-toggle=history]").click(function(){
+$('[data-toggle=history]').click(function(){
     storage.getAll(function(error, data) {
         if (error) throw error;
         if ($.isEmptyObject(data)) {
@@ -217,10 +216,9 @@ ipc.on('load-version', function(arg, val) {
             return;
         }
 
-        $("section").text("");
+        $('section').text('');
         $.each(data, function(i, v) {
-            //var input = original_input.clone().val(v).appendTo("section").after("<div/>").after("<span></span>");
-            var input = original_input.clone().val(v).appendTo("section").wrap("<div/>").after("<span/>");
+            var input = original_input.clone().val(v).appendTo('section').wrap('<div/>').after('<span/>');
 
             setInputWidth(input);
         });
@@ -228,9 +226,10 @@ ipc.on('load-version', function(arg, val) {
 });
 
 // When save butotn is clicked
-$("#save").on("click", function(e){
+$('#save').on('click', function(e){
     var all = Array.from($('input').filter((i, el) => $(el).val().length > 1).map((i, el) => $(el).val()));
     if (all.length == 0) {
+        ipc.send('open-error-dialog-save');
         return;
     }
 
@@ -246,20 +245,20 @@ $("#save").on("click", function(e){
         '0' + date.getSeconds()
     ].map(component => component.slice(-2));
 
-    console.log(date);
-
     date = date.slice(0, 3).join('-') + ' ' + date.slice(3).join(':');
 
     storage.set('' + date, json);
+
+    ipc.send('open-message-dialog-save');
 
     e.preventDefault();
 });
 
 // Function to set input width relative to length
 function setInputWidth(input) {
-    $(input).css("width", (($(input).val().length + 1) * 9.7) + 'px');
+    $(input).css('width', (($(input).val().length + 1) * 9.7) + 'px');
 }
-$(document).on('keydown',"section input",function(e){
+$(document).on('keydown','section input',function(e){
     setInputWidth($(this));
 });
 
@@ -267,6 +266,6 @@ $(document).on('keydown',"section input",function(e){
 // Focus on ready
 var original_input;
 $(document).ready(function(){
-    $("input").focus();
-    original_input = $("input")
+    $('input').focus();
+    original_input = $('input')
 });

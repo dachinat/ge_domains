@@ -30,12 +30,12 @@
     const storage = require('electron-json-storage');
     storage.setDataPath(os.tmpdir() + '/ge_domains');
 
-    $(document).on("click", 'a[href="#"]', function(event){
+    $(document).on('click', 'a[href="#"]', function(event){
         ipc.send('load-version', $.trim($(this).text()));
         window.close();
     });
 
-    $(document).on("click", 'a[href="#delete"]', function(event){
+    $(document).on('click', 'a[href="#delete"]', function(event){
         ipc.send('open-confirm-dialog-history', $('*').index(this));
     });
 
@@ -52,7 +52,7 @@
             });
 
             // close if empty
-            if ($("ul li").length == 0) {
+            if ($('ul li').length == 0) {
                 window.close();
             }
         }
@@ -67,7 +67,7 @@
         }
 
         $.each(data, function(i){
-            $("<a>").attr("href","#").html('<i class="fa fa-file-o"></i> ' + i).appendTo($("<li/>").appendTo($("ul"))).before('<a class="txt-red" href="#delete" style="float:right;"><i class="fa fa-remove"></i></a>');
+            $('<a>').attr('href','#').html('<i class="fa fa-file-o"></i> ' + i).appendTo($('<li/>').appendTo($('ul'))).before('<a class="txt-red" href="#delete" style="float:right;"><i class="fa fa-remove"></i></a>');
         });
     });
 </script>
