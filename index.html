@@ -5,14 +5,15 @@
     <title>GE დომენები (BETA)</title>
     <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="./assets/stylesheets/style.css"/>
+    <script src="./node_modules/dragselect/dist/ds.min.js"></script>
 </head>
 <body>
 <h1>GE დომენების შემოწმება</h1>
 
 <div style="margin-top:45px;">
-    <section>
-        <div>
-            <input />
+    <section id="domain-list">
+        <div class="domain-container">
+            <input class="domain-input" />
             <span></span>
         </div>
     </section>
@@ -32,7 +33,7 @@
 
 <script>
     "use strict";
-    require('./renderer.js')
+require('./renderer.js')
 </script>
 
 </body>

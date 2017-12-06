@@ -20,7 +20,7 @@ $(document).on('keypress', 'section input',function(e){
         if ($(this).val().length < 2 || !/^[A-Za-z0-9\-\.]+$/.test($(this).val())) {
             return;
         }
-        original_input.clone().val('').appendTo($(this).parent().parent()).wrap('<div/>').after('<span/>').focus();
+        original_input.clone().val('').appendTo($(this).parent().parent()).wrap('<div class="domain-container"/>').after('<span/>').focus();
         checkDomain($(this));
     }
 });
@@ -89,26 +89,26 @@ function checkDomain(input) {
 
     input.next().text('მოწმდება...')
 
-    $.ajax({
-        url: 'http://nic.net.ge/Home/DomainCheck',
-        type: 'post',
-        data: {
-            'Domain': domain,
-            'TopLevelDomain': '.ge'
-        },
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        success: function (data, textStatus, jqXHR) {
-            var msg = /დაკავებულია/.test(data['Data']) ?
-                '<span class="text-red">დაკავებულია</span>' : /არასწორი დომენური სახელი/.test(data['Data']) ?
-                    '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
-
-            input.next().html(msg);
-
-            store[domain] = [+new Date(), msg];
-        }
-    });
+    // $.ajax({
+    //     url: 'http://nic.net.ge/Home/DomainCheck',
+    //     type: 'post',
+    //     data: {
+    //         'Domain': domain,
+    //         'TopLevelDomain': '.ge'
+    //     },
+    //     headers: {
+    //         'X-Requested-With': 'XMLHttpRequest'
+    //     },
+    //     success: function (data, textStatus, jqXHR) {
+    //         var msg = /დაკავებულია/.test(data['Data']) ?
+    //             '<span class="text-red">დაკავებულია</span>' : /არასწორი დომენური სახელი/.test(data['Data']) ?
+    //                 '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+    //
+    //         input.next().html(msg);
+    //
+    //         store[domain] = [+new Date(), msg];
+    //     }
+    // });
 }
 
 // When check button is clicked
@@ -174,7 +174,7 @@ $(document).on('click', '#paste', function(){
 
     $('section').text('');
     $.each(domains, function(i, v) {
-        var input = original_input.clone().val(v).appendTo('section').wrap('<div/>').after('<span/>');
+        var input = original_input.clone().val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
         setInputWidth(input);
     });
 });
@@ -183,7 +183,7 @@ $(document).on('click', '#paste', function(){
 
 $('#clear').click(function(){
     $('section').text('');
-    original_input.clone().val('').appendTo('section').wrap('<div/>').after('<span/>').focus();
+    original_input.clone().val('').appendTo('section').wrap('<div class="domain-container"/>').after('<span/>').focus();
 });
 
 // When history butotn is clciked
@@ -224,7 +224,7 @@ ipc.on('load-version', function(arg, val) {
 
         $('section').text('');
         $.each(data, function(i, v) {
-            var input = original_input.clone().val(v).appendTo('section').wrap('<div/>').after('<span/>');
+            var input = original_input.clone().val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
 
             setInputWidth(input);
         });
@@ -262,7 +262,59 @@ $('#save').on('click', function(e){
 
 // Keyboard shortcuts
 
-var ctrlA = false;
+function remove() {
+    if ($('section input.txt-selected').length == 0) {
+        return;
+    }
+
+    var parent = $('section input.txt-selected').first().parent().prev().find("input").first();
+
+    if ($('section input.txt-selected').length == $('section input').length) {
+        $('section input.txt-selected').parent().not(':first').remove();
+        $('section input').val('').focus();
+    } else {
+        $('section input.txt-selected').parent().remove();
+
+        if (parent.length == 0) {
+            $('section input').focus();
+        } else {
+            parent.focus();
+        }
+    }
+}
+
+function add() {
+    $.each(domains, function(i, v) {
+        var input = original_input.clone().val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
+        setInputWidth(input);
+    });
+}
+
+$(document).on('keydown', function(e){
+    // ctrl|cmd
+    if (e.keyCode == 91 || e.keyCode == 17) {
+        return;
+    }
+
+    // backspace
+    if (e.keyCode == 8 || e.keyCode == 46) {
+        remove();
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 86) {
+        e.preventDefault();
+        remove();
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
+        $('section input').addClass('txt-selected');
+    } else {
+        $('section input').removeClass('txt-selected');
+    }
+});
+
+/*var ctrlA = false;
+
 $(document).on('keydown', 'section input', function(e){
     // only cmd|ctrl
     if (e.keyCode == 91 || e.keyCode == 17) {
@@ -281,6 +333,10 @@ $(document).on('keydown', 'section input', function(e){
 
     // Backspace, delete
     if ((e.keyCode == 8 || e.keyCode == 46) && ctrlA) {
+        // var parent = $('section input.txt-selected').first().parent().prev().find("input").first()
+        // $('section input.txt-selected').parent().remove();
+        // e.preventDefault();
+        // parent.focus();
         $('section div:not(:first)').remove();
         $('section input').val('').focus();
     } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 67) && ctrlA) { // Ctrl|cmd+c
@@ -306,6 +362,24 @@ $(document).on('keydown', 'section input', function(e){
 
     $('section input').removeClass('txt-selected');
     ctrlA = false;
+});*/
+
+
+// + mouse
+
+var ds = new DragSelect({
+    selectables: document.getElementsByClassName("domain-container"),
+    customStyles: true,
+    onDragStart: function() {
+        $('section input').removeClass('txt-selected ds');
+        ds.addSelectables(document.getElementsByClassName('domain-container'));
+    },
+    onDragMove: function(elements) {
+        $('section input').removeClass('txt-selected ds');
+        $(ds.getSelection()).each(function(el){
+            $(this).find("input").addClass('txt-selected ds');
+        });
+    }
 });
 
 // Function to set input width relative to length
