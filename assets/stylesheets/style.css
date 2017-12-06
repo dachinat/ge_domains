@@ -10,8 +10,8 @@ h1, h3 {
 
 .btn {
     border-radius: 5px;
-    padding: 15px 25px;
-    font-size: 22px;
+    padding: 15px 20px;
+    font-size: 18px;
     text-decoration: none;
     margin: 20px;
     color: #fff;
@@ -165,6 +165,6 @@ select {
 }
 
 #main-actions {
-    margin-left: 8px;
-    margin-top: 50px;
+    margin-left: 30px;
+    margin-top: 35px;
 }

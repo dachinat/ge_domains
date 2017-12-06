@@ -11,6 +11,7 @@ const BrowserWindow = remote.BrowserWindow;
 const ipc = require('electron').ipcRenderer
 const os = require('os');
 const storage = require('electron-json-storage');
+const {Menu} = remote;
 
 storage.setDataPath(os.tmpdir() + '/ge_domains');
 // When enter key is pressed in input
@@ -182,7 +183,7 @@ $('#clear').click(function(){
 
 // When history butotn is clciked
 $('[data-toggle=history]').click(function(){
-    storage.getAll(function(error, data) {
+    storage.getAll(function(e`rror, data) {
         if (error) throw error;
         if ($.isEmptyObject(data)) {
             ipc.send('open-error-dialog-history')
@@ -191,7 +192,7 @@ $('[data-toggle=history]').click(function(){
                 parent: remote.getCurrentWindow(),
                 modal: true,
                 width: 300,
-                height: 500,
+                height: 535,
                 show: false,
                 backgroundColor: '#fffff'
             });
@@ -269,3 +270,13 @@ $(document).ready(function(){
     $('input').focus();
     original_input = $('input')
 });
+
+// Context menus
+
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    var mainMenu = Menu.getApplicationMenu().items.filter(function(item){
+        return item.label == "Edit";
+    })[0].submenu;
+    mainMenu.popup(remote.getCurrentWindow());
+}, false);

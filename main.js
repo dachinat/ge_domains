@@ -9,19 +9,20 @@ const path = require('path')
 const url = require('url')
 
 const dialog = require('electron').dialog
+const {Menu} = require('electron')
 
 let mainWindow
 
 function createWindow () {
     mainWindow = new BrowserWindow({
-        width: 500,
-        height: 685,
+        width: 490,
+        height: 670,
         backgroundColor: '#cee8fa',
         resizable: false,
         maximizable: false,
         fullscreenable: false,
-        title: 'GE დომენები',
-        icon: path.join(__dirname, 'ge_domains.png'),
+        title: 'GE დომენები (BETA)',
+        icon: path.join(__dirname, 'assets', 'icons', 'ge_domains.png'),
         show: false
     })
 
@@ -31,7 +32,7 @@ function createWindow () {
         slashes: true
     }))
 
-    mainWindow.webContents.openDevTools()
+    //mainWindow.webContents.openDevTools()
 
     mainWindow.on('closed', function () {
         mainWindow = null
@@ -45,11 +46,54 @@ function createWindow () {
     ipc.on('load-version', function(event, arg) {
         mainWindow.webContents.send('load-version', arg);
     });
+
+    var template = [{
+        label: 'GE Domains',
+        submenu: [{
+            label: 'Quit',
+            accelerator: 'CmdOrCtrl+Q',
+            click: function() {
+                app.quit();
+            }
+        }]
+    }, {
+        label: 'Edit',
+        submenu: [{
+            label: 'Undo',
+            accelerator: 'CmdOrCtrl+Z',
+            selector: 'undo:'
+        }, {
+            label: 'Redo',
+            accelerator: 'Shift+CmdOrCtrl+Z',
+            selector: 'redo:'
+        }, {
+            type: 'separator'
+        }, {
+            label: 'Cut',
+            accelerator: 'CmdOrCtrl+X',
+            selector: 'cut:'
+        }, {
+            label: 'Copy',
+            accelerator: 'CmdOrCtrl+C',
+            selector: 'copy:'
+        }, {
+            label: 'Paste',
+            accelerator: 'CmdOrCtrl+V',
+            selector: 'paste:'
+        }, {
+            label: 'Select All',
+            accelerator: 'CmdOrCtrl+A',
+            selector: 'selectAll:'
+        }]
+    }];
+    var osxMenu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(osxMenu);
 }
+
+
 
 app.on('ready', createWindow)
 
-// Quit when all windows are closed.
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit()
