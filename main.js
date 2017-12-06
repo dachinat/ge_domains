@@ -1,7 +1,6 @@
 const electron = require('electron')
-// Module to control application life.
 const app = electron.app
-// Module to create native browser window.
+
 const BrowserWindow = electron.BrowserWindow
 
 const ipc = require('electron').ipcMain
@@ -10,40 +9,6 @@ const path = require('path')
 const url = require('url')
 
 const dialog = require('electron').dialog
-
-ipc.on('open-error-dialog-check', function (event) {
-    dialog.showErrorBox('შეცდომა', 'შესამოწმებლად დომენები არაა მოცემული.')
-})
-
-ipc.on('open-error-dialog-history', function (event) {
-    dialog.showErrorBox('შეცდომა', 'ისტორიაში ჯერ ჩანაწერები არ დამატებულა.')
-})
-
-ipc.on('open-confirm-dialog-history', function (event, args) {
-    const options = {
-        type: 'info',
-        title: 'დადასტურება',
-        message: "ნამდვილად გსურთ ამ შენატანის გაუქმება?",
-        buttons: ['კი', 'არა']
-    }
-    dialog.showMessageBox(options, function (index) {
-        event.sender.send('confirm-dialog-selection-history', [index, args])
-    })
-})
-
-ipc.on('open-error-dialog-copy', function (event) {
-    dialog.showErrorBox('შეცდომა', 'დასაკოპირებლად არაფერია.')
-});
-
-ipc.on('open-message-dialog-copy', function (event) {
-    dialog.showMessageBox({
-       type: 'info',
-       title: 'შეტყობინება',
-       message: "დომენების სია წარმატებით დაკოპირდა",
-       buttons: ['დახურვა']
-    });
-});
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -86,23 +51,6 @@ function createWindow () {
         mainWindow.focus();
     })
 
-    /* Child */
-
-    // let child = new BrowserWindow({
-    //     parent: mainWindow,
-    //     modal: true,
-    //     width: 300,
-    //     height: 300,
-    //     show: true
-    // })
-    //
-    //
-    // child.loadURL('file://' + __dirname + '/history.html')
-    // child.once('ready-to-show', () => {
-    //     child.show()
-    // })
-
-
     ipc.on('load-version', function(event, arg) {
         mainWindow.webContents.send('load-version', arg);
     });
@@ -130,5 +78,35 @@ app.on('activate', function () {
     }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+ipc.on('open-error-dialog-check', function (event) {
+    dialog.showErrorBox('შეცდომა', 'შესამოწმებლად დომენები არაა მოცემული.')
+})
+
+ipc.on('open-error-dialog-history', function (event) {
+    dialog.showErrorBox('შეცდომა', 'ისტორიაში ჯერ ჩანაწერები არ დამატებულა.')
+})
+
+ipc.on('open-confirm-dialog-history', function (event, args) {
+    const options = {
+        type: 'info',
+        title: 'დადასტურება',
+        message: "ნამდვილად გსურთ ამ შენატანის გაუქმება?",
+        buttons: ['კი', 'არა']
+    }
+    dialog.showMessageBox(options, function (index) {
+        event.sender.send('confirm-dialog-selection-history', [index, args])
+    })
+})
+
+ipc.on('open-error-dialog-copy', function (event) {
+    dialog.showErrorBox('შეცდომა', 'დასაკოპირებლად არაფერია.')
+});
+
+ipc.on('open-message-dialog-copy', function (event) {
+    dialog.showMessageBox({
+        type: 'info',
+        title: 'შეტყობინება',
+        message: "დომენების სია წარმატებით დაკოპირდა",
+        buttons: ['დახურვა']
+    });
+});

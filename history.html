@@ -4,92 +4,13 @@
     <meta charset="UTF-8">
 
     <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css"/>
-
-    <style type="text/css">
-        body {
-            color: #2d527c;
-            font-family: MarkGEO-Regular;
-            font-size:16px;
-        }
-
-        h3 {
-            font-family: MarkGEOCAPS-Regular;
-        }
-
-        .btn_sm {
-            border-radius: 5px;
-            text-decoration: none;
-            position: relative;
-            display: inline-block;
-            font-size:13px;
-            margin:5px;
-            padding:10px 15px;
-        }
-        .btn_sm:active {
-            transform: translate(0px, 2px);
-            -webkit-transform: translate(0px, 2px);
-            box-shadow: 0px 1px 0px 0px;
-        }
-
-        .blue_sm {
-            color:#fff;
-            background-color: #55acee;
-            box-shadow: 0px 2px 0px 0px #3C93D5;
-        }
-        .blue_sm:hover {
-            background-color: #6FC6FF;
-        }
-
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            height: 340px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-        li {
-            margin-bottom:5px;
-            padding-bottom:3px;
-            border-bottom: 2px dashed #2d527c;
-        }
-        li a {
-            text-decoration: none;
-            color: #000;
-        }
-
-        li a.txt-red {
-            color: #ce594e;
-        }
-
-
-        @font-face {
-            font-family: MarkGEO-Regular;
-            src: url("./assets/fonts/MarkGEO-Regular.eot?#iefix") format("embedded-opentype"),
-            url("./assets/fonts/MarkGEO-Regular.woff") format("woff"),
-            url("./assets/fonts/MarkGEO-Regular.ttf") format("truetype"),
-            url("./assets/fonts/MarkGEO-Regular.svg#MarkGEO-Regular") format("svg");
-            font-weight:normal;
-            font-style:normal;
-        }
-
-        @font-face {
-            font-family: MarkGEOCAPS-Regular;
-            src: url("./assets/fonts/MarkGEOCAPS-Regular.eot?#iefix") format("embedded-opentype"),
-            url("./assets/fonts/MarkGEOCAPS-Regular.woff") format("woff"),
-            url("./assets/fonts/MarkGEOCAPS-Regular.ttf") format("truetype"),
-            url("./assets/fonts/MarkGEOCAPS-Regular.svg#MarkGEOCAPS-Regular") format("svg");
-            font-weight:normal;
-            font-style:normal;
-        }
-    </style>
+    <link rel="stylesheet" href="./assets/stylesheets/style.css"/>
 </head>
 <body>
 
 <h4>აირჩიეთ ჩანაწერი</h4>
 
 <div style="margin:15px;background:#fff;">
-
     <ul>
     </ul>
 
@@ -98,11 +19,16 @@
     </div>
 </div>
 
-
 <script>
+    "use strict";
+
     window.$ = window.jQuery = require('jquery');
 
     const ipc = require('electron').ipcRenderer;
+
+    const os = require('os');
+    const storage = require('electron-json-storage');
+    storage.setDataPath(os.tmpdir() + '/ge_domains');
 
     $(document).on("click", 'a[href="#"]', function(event){
         ipc.send('load-version', $.trim($(this).text()));
@@ -112,8 +38,11 @@
     $(document).on("click", 'a[href="#delete"]', function(event){
         ipc.send('open-confirm-dialog-history', $('*').index(this));
     });
+
     ipc.on('confirm-dialog-selection-history', function (event, response) {
         if (response[0] === 0) {
+            var element;
+
             element = $('*').eq(response[1]);
             $(element).parent().remove();
 
@@ -129,11 +58,6 @@
         }
     })
 
-    const os = require('os');
-    const storage = require('electron-json-storage');
-
-    storage.setDataPath(os.tmpdir() + '/ge_domains');
-
     storage.getAll(function(error, data) {
         if (error) throw error;
 
@@ -146,7 +70,6 @@
             $("<a>").attr("href","#").html('<i class="fa fa-file-o"></i> ' + i).appendTo($("<li/>").appendTo($("ul"))).before('<a class="txt-red" href="#delete" style="float:right;"><i class="fa fa-remove"></i></a>');
         });
     });
-
 </script>
 
 </body>
