@@ -9,6 +9,10 @@ h1, h3 {
     font-family: MarkGEOCAPS-Regular;
 }
 
+.txt-selected {
+    background: #b2d7fe;
+}
+
 .btn {
     border-radius: 5px;
     padding: 15px 20px;

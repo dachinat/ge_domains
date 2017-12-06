@@ -131,7 +131,7 @@ $('#check').on('click', function(){
 });
 
 // When copy button is clicked
-$('#copy').click(function(){
+$(document).on('click','#copy', function(e){
     var text = Array.from(
         $('input').filter(
             (i, el) => $(el).val().length > 1
@@ -150,16 +150,22 @@ $('#copy').click(function(){
     ).join("\n");
 
     if (text.length == 0) {
-        ipc.send('open-error-dialog-copy');
+        // Show dialogs only on direct click
+        if (e.originalEvent) {
+            ipc.send('open-error-dialog-copy');
+        }
         return;
     }
 
     clipboard.writeText(text);
-    ipc.send('open-message-dialog-copy');
+
+    if (e.originalEvent) {
+        ipc.send('open-message-dialog-copy');
+    }
 });
 
 // When paste button is clicked
-$('#paste').click(function(){
+$(document).on('click', '#paste', function(){
     var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
 
     if (domains === null || domains.length == 0) {
@@ -169,7 +175,6 @@ $('#paste').click(function(){
     $('section').text('');
     $.each(domains, function(i, v) {
         var input = original_input.clone().val(v).appendTo('section').wrap('<div/>').after('<span/>');
-
         setInputWidth(input);
     });
 });
@@ -253,6 +258,54 @@ $('#save').on('click', function(e){
     ipc.send('open-message-dialog-save');
 
     e.preventDefault();
+});
+
+// Keyboard shortcuts
+
+var ctrlA = false;
+$(document).on('keydown', 'section input', function(e){
+    // only cmd|ctrl
+    if (e.keyCode == 91 || e.keyCode == 17) {
+        return;
+    }
+
+    // Ctrl|cmd+a
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
+        console.log('activate ctrl|cmd+a');
+        ctrlA = true;
+
+        $('section input').addClass('txt-selected');
+
+        return;
+    }
+
+    // Backspace, delete
+    if ((e.keyCode == 8 || e.keyCode == 46) && ctrlA) {
+        $('section div:not(:first)').remove();
+        $('section input').val('').focus();
+    } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 67) && ctrlA) { // Ctrl|cmd+c
+        e.preventDefault();
+        $('#copy').trigger('click');
+        console.log('copy');
+    } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 86) && ctrlA) { // Ctrl|cmd+v
+        $('#paste').trigger('click');
+        console.log('paste');
+    } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 88) && ctrlA) { // Ctrl|cmd+x
+        e.preventDefault();
+        $('#copy').trigger('click');
+        $('section div:not(:first)').remove();
+        $('section input').val('').focus();
+    } else if (ctrlA) { // any other
+        // If non-special key is pressed
+        var char = String.fromCharCode(event.keyCode);
+        if (char.match(/(\w|\s)/g)) {
+            $('section div:not(:first)').remove();
+            $('section input').val(char).focus();
+        }
+    }
+
+    $('section input').removeClass('txt-selected');
+    ctrlA = false;
 });
 
 // Function to set input width relative to length
