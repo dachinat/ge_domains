@@ -31,6 +31,20 @@ ipc.on('open-confirm-dialog-history', function (event, args) {
     })
 })
 
+ipc.on('open-error-dialog-copy', function (event) {
+    dialog.showErrorBox('შეცდომა', 'დასაკოპირებლად არაფერია.')
+});
+
+ipc.on('open-message-dialog-copy', function (event) {
+    dialog.showMessageBox({
+       type: 'info',
+       title: 'შეტყობინება',
+       message: "დომენების სია წარმატებით დაკოპირდა",
+       buttons: ['დახურვა']
+    });
+});
+
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow

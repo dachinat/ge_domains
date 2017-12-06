@@ -342,13 +342,19 @@
             )
         ).join("\n");
 
+        if (text.length == 0) {
+            ipc.send("open-error-dialog-copy");
+            return;
+        }
+
         clipboard.writeText(text);
+        ipc.send("open-message-dialog-copy");
     });
 
     $("#paste").click(function(){
         var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
 
-        if (domains.length == 0) {
+        if (domains === null || domains.length == 0) {
             return;
         }
 
