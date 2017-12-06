@@ -233,21 +233,21 @@
        setInputWidth($(this));
     });
 
-    $("section, section div").on("click", function(e){
+    // focus on click
+    $(document).on("click", "section, section div", function(e) {
         if (e.target !== this) {
             return;
         }
 
-       $(this).find("input").last().focus();
+        $(this).find("input").last().focus();
     });
 
-
+    //
     var original_input;
     $(document).ready(function(){
        $("input").focus();
        original_input = $("input")
     });
-
 
     //
     var store = {}
@@ -348,12 +348,23 @@
     $("#paste").click(function(){
         var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
 
+        if (domains.length == 0) {
+            return;
+        }
+
         $("section").text("");
         $.each(domains, function(i, v) {
             var input = original_input.clone().val(v).appendTo("section").wrap("<div/>").after("<span/>");
 
             setInputWidth(input);
         });
+    });
+
+    // clear
+
+    $("#clear").click(function(){
+        $("section").text("");
+        original_input.clone().val("").appendTo("section").wrap("<div/>").after("<span/>").focus();
     });
 
     //
