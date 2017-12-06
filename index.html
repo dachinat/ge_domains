@@ -19,10 +19,10 @@
 
         .btn {
              border-radius: 5px;
-             padding: 15px 15px;
+             padding: 15px 25px;
              font-size: 22px;
              text-decoration: none;
-             margin: 7px;
+             margin: 20px;
              color: #fff;
              position: relative;
              display: inline-block;
@@ -33,6 +33,21 @@
             box-shadow: 0px 1px 0px 0px;
         }
 
+        .btn_sm {
+           border-radius: 5px;
+           text-decoration: none;
+           position: relative;
+           display: inline-block;
+           font-size:13px;
+           margin:5px;
+           padding:10px 15px;
+        }
+       .btn_sm:active {
+           transform: translate(0px, 2px);
+           -webkit-transform: translate(0px, 2px);
+           box-shadow: 0px 1px 0px 0px;
+       }
+
         .blue {
             background-color: #55acee;
             box-shadow: 0px 5px 0px 0px #3C93D5;
@@ -41,6 +56,15 @@
             background-color: #6FC6FF;
         }
 
+        .gray_sm {
+            color:#7a7a7a;
+            background-color: #f9f9f9;
+            box-shadow: 0px 2px 0px 0px #d6d6d6;
+        }
+        .gray_sm:hover {
+            background-color: #eeeeee;
+        }
+                 
         .gray {
             color:#7a7a7a;
             background-color: #f9f9f9;
@@ -136,8 +160,14 @@
     </section>
 </div>
 
+<div style="margin-left:22px;margin-top:10px;">
+    <a data-toggle="history" href="#" class="btn_sm gray_sm"><i class="fa fa-history"></i></a>
+    <a id="copy" href="#" class="btn_sm gray_sm"><i class="fa fa-copy"></i> კოპირება</a>
+    <a id="paste" href="#" class="btn_sm gray_sm"><i class="fa fa-paste"></i> ჩასმა</a>
+    <a id="clear" href="#" class="btn_sm gray_sm"><i class="fa fa-remove"></i> გასუფთავება</a>
+</div>
+
 <div id="main-actions">
-    <a data-toggle="history" href="#" class="btn gray"><i class="fa fa-history"></i></a>
     <a id="save" href="#" class="btn gray">დამახსოვრება</a>
     <a id="check" href="#" class="btn blue">შემოწმება</a>
 </div>
@@ -151,7 +181,11 @@
     const SEC_LIMIT = 120; // Seconds to keep records in memory
 
     $(document).on('keypress',"section input",function(e){
-        if (e.keyCode == 13 && $(this).val().length > 1){
+        if (e.keyCode == 13){
+
+            if ($(this).val().length < 2 || !/^[A-Za-z0-9\-\.]+$/.test($(this).val())) {
+                return;
+            }
             original_input.clone().val("").appendTo($(this).parent().parent()).wrap("<div/>").after("<span/>").focus();
 
             //$(this).next().remove(); // remove status (if possible), will be inserted with next line (erase, return)
@@ -199,7 +233,7 @@
        setInputWidth($(this));
     });
 
-    $("section, section *").on("click", function(e){
+    $("section, section div").on("click", function(e){
         if (e.target !== this) {
             return;
         }
@@ -258,7 +292,9 @@
             },
             success: function (data, textStatus, jqXHR) {
                 var msg = /დაკავებულია/.test(data['Data']) ?
-                    '<span class="text-red">დაკავებულია</span>' : '<span class="text-blue">თავისუფალია</span>';
+                    '<span class="text-red">დაკავებულია</span>' : /არასწორი დომენური სახელი/.test(data['Data']) ?
+                        '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+
                 input.next().html(msg);
 
                 store[domain] = [+new Date(), msg];
@@ -285,6 +321,40 @@
         }
     });
 
+    // copy paste
+    const {clipboard} = require('electron')
+
+    $("#copy").click(function(){
+        var text = Array.from(
+            $('input').filter(
+                (i, el) => $(el).val().length > 1
+            ).map(
+                (i, el) => {
+                    var domain = $(el).val();
+                    if (!/.+\.ge$/.test(domain)) {
+                        domain += ".ge";
+                    }
+
+                    var status = $(el).next().text()
+                    domain += (status.length > 0) ? ' (' + status + ')' : '';
+                    return domain;
+                }
+            )
+        ).join("\n");
+
+        clipboard.writeText(text);
+    });
+
+    $("#paste").click(function(){
+        var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
+
+        $("section").text("");
+        $.each(domains, function(i, v) {
+            var input = original_input.clone().val(v).appendTo("section").wrap("<div/>").after("<span/>");
+
+            setInputWidth(input);
+        });
+    });
 
     //
 

@@ -39,7 +39,7 @@ function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 500,
-        height: 620,
+        height: 685,
         backgroundColor: '#cee8fa',
         resizable: false,
         maximizable: false,
