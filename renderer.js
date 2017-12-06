@@ -183,7 +183,7 @@ $('#clear').click(function(){
 
 // When history butotn is clciked
 $('[data-toggle=history]').click(function(){
-    storage.getAll(function(e`rror, data) {
+    storage.getAll(function(error, data) {
         if (error) throw error;
         if ($.isEmptyObject(data)) {
             ipc.send('open-error-dialog-history')

@@ -2,6 +2,7 @@ body {
     color: #2d527c;
     font-family: MarkGEO-Regular;
     font-size:16px;
+    -webkit-user-select:none;
 }
 
 h1, h3 {
