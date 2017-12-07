@@ -132,22 +132,7 @@ $('#check').on('click', function(){
 
 // When copy button is clicked
 $(document).on('click','#copy', function(e){
-    var text = Array.from(
-        $('input').filter(
-            (i, el) => $(el).val().length > 1
-        ).map(
-            (i, el) => {
-                var domain = $(el).val();
-                if (!/.+\.ge$/.test(domain)) {
-                    domain += '.ge';
-                }
-
-                var status = $(el).next().text()
-                domain += (status.length > 0) ? ' (' + status + ')' : '';
-                return domain;
-            }
-        )
-    ).join("\n");
+    var text = copy('input');
 
     if (text.length == 0) {
         // Show dialogs only on direct click
@@ -283,10 +268,38 @@ function remove() {
     }
 }
 
-function add() {
+function copy(input) {
+    return Array.from(
+        $(input).filter(
+            (i, el) => $(el).val().length > 1
+        ).map(
+            (i, el) => {
+                var domain = $(el).val();
+                if (!/.+\.ge$/.test(domain)) {
+                    domain += '.ge';
+                }
+
+                var status = $(el).next().text()
+                domain += (status.length > 0) ? ' (' + status + ')' : '';
+                return domain;
+            }
+        )
+    ).join("\n");
+}
+
+function paste(domains, current) {
     $.each(domains, function(i, v) {
-        var input = original_input.clone().val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
-        setInputWidth(input);
+        var input = $(original_input.clone().val(v));
+
+        input = $(input).after("<p>test</p>");
+
+        console.log(input);
+
+        console.log(input[0]);
+
+        $(current).parent().after($('<div class="domain-container"/>').html($(input)).append("<span/>"));
+
+        setInputWidth($(current).parent().next().find("input"));
     });
 }
 
@@ -301,10 +314,52 @@ $(document).on('keydown', function(e){
         remove();
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.keyCode == 86) {
+    // ctrl+c
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 67) {
+        if ($('input.txt-selected').length == 0) {
+            return;
+        }
+
+        var text = copy('input.txt-selected');
+
+        if (text.length == 0) {
+            return;
+        }
+
+        clipboard.writeText(text);
+
         e.preventDefault();
+    }
+
+    // ctrl+v
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 86) {
+        if ($('input.txt-selected').length == 0) {
+            return;
+        }
+
+        e.preventDefault();
+
+        var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
+        if (domains === null || domains.length == 0) {
+            return;
+        }
+
+        remove();
+        paste(domains, $('input:focus'));
+    }
+
+    // ctrl+x
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 88) {
+        var text = copy('input.txt-selected');
+
+        if (text.length == 0) {
+            return;
+        }
+
+        clipboard.writeText(text);
         remove();
     }
+
 
     if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
         $('section input').addClass('txt-selected');
@@ -376,9 +431,12 @@ var ds = new DragSelect({
     },
     onDragMove: function(elements) {
         $('section input').removeClass('txt-selected ds');
-        $(ds.getSelection()).each(function(el){
-            $(this).find("input").addClass('txt-selected ds');
-        });
+        var selection = ds.getSelection()
+        if (selection.length > 1) {
+            $(selection).each(function(el){
+                $(this).find("input").addClass('txt-selected ds');
+            });
+        }
     }
 });
 
