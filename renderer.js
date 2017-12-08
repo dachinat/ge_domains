@@ -12,15 +12,20 @@ const ipc = require('electron').ipcRenderer
 const os = require('os');
 const storage = require('electron-json-storage');
 const {Menu} = remote;
+const pkg = require('./package.json');
 
 storage.setDataPath(os.tmpdir() + '/ge_domains');
+
+// Add verison
+$('#version').text('v' + pkg.version);
+
 // When enter key is pressed in input
 $(document).on('keypress', 'section input',function(e){
     if (e.keyCode == 13) {
         if ($(this).val().length < 2 || !/^[A-Za-z0-9\-\.]+$/.test($(this).val())) {
             return;
         }
-        original_input.clone().val('').appendTo($(this).parent().parent()).wrap('<div class="domain-container"/>').after('<span/>').focus();
+        original_input.clone().removeClass("txt-selected").val('').appendTo($(this).parent().parent()).wrap('<div class="domain-container"/>').after('<span/>').focus();
         checkDomain($(this));
     }
 });
@@ -32,12 +37,18 @@ $(document).on('keyup','section input',function(e){
         if ($(this).get(0).selectionStart === 0) {
 
             // Focus on previous input
-            $(this).parent().prev().find('input').focus();
+            if ($(this).parent().prev().find('input').length > 0) {
+                $(this).parent().prev().find('input').focus();
+            } else {
+                // Fix when second input with empty value exists
+                $("section input").focus();
+            }
 
             // Delete surrunding divs for all except first input
             if ($(this).val() == '' && $($(this).parent().parent().children()).length > 1) {
                 $(this).parent().remove();
             }
+
             // When caret is in the end of input
         } else if ($(this).get(0).selectionStart === $(this).val().length) {
             // Clear status
@@ -54,12 +65,13 @@ $(document).on('keyup','section input',function(e){
     }
 });
 
+
+
 // Focus on input on nearby clicks
 $(document).on('click', 'section, section div', function(e) {
     if (e.target !== this) {
         return;
     }
-
     $(this).find('input').last().focus();
 });
 
@@ -89,26 +101,26 @@ function checkDomain(input) {
 
     input.next().text('მოწმდება...')
 
-    // $.ajax({
-    //     url: 'http://nic.net.ge/Home/DomainCheck',
-    //     type: 'post',
-    //     data: {
-    //         'Domain': domain,
-    //         'TopLevelDomain': '.ge'
-    //     },
-    //     headers: {
-    //         'X-Requested-With': 'XMLHttpRequest'
-    //     },
-    //     success: function (data, textStatus, jqXHR) {
-    //         var msg = /დაკავებულია/.test(data['Data']) ?
-    //             '<span class="text-red">დაკავებულია</span>' : /არასწორი დომენური სახელი/.test(data['Data']) ?
-    //                 '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
-    //
-    //         input.next().html(msg);
-    //
-    //         store[domain] = [+new Date(), msg];
-    //     }
-    // });
+    $.ajax({
+        url: 'http://nic.net.ge/Home/DomainCheck',
+        type: 'post',
+        data: {
+            'Domain': domain,
+            'TopLevelDomain': '.ge'
+        },
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function (data, textStatus, jqXHR) {
+            var msg = /დაკავებულია/.test(data['Data']) ?
+                '<span class="text-red">დაკავებულია</span>' : /არასწორი დომენური სახელი/.test(data['Data']) ?
+                    '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+
+            input.next().html(msg);
+
+            store[domain] = [+new Date(), msg];
+        }
+    });
 }
 
 // When check button is clicked
@@ -151,24 +163,22 @@ $(document).on('click','#copy', function(e){
 
 // When paste button is clicked
 $(document).on('click', '#paste', function(){
-    var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
+    var e = $.Event('keydown');
+    e.keyCode = 86;
+    e.ctrlKey = true;
 
-    if (domains === null || domains.length == 0) {
-        return;
-    }
-
-    $('section').text('');
-    $.each(domains, function(i, v) {
-        var input = original_input.clone().val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
-        setInputWidth(input);
-    });
+    $('section input').addClass('txt-selected');
+    $('section input.txt-selected').first().trigger(e);
 });
 
 // When clear button is clicked
 
 $('#clear').click(function(){
-    $('section').text('');
-    original_input.clone().val('').appendTo('section').wrap('<div class="domain-container"/>').after('<span/>').focus();
+    var e = $.Event('keydown');
+    e.keyCode = 46;
+
+    $('section input').addClass('txt-selected');
+    $('section input.txt-selected').first().trigger(e);
 });
 
 // When history butotn is clciked
@@ -209,7 +219,7 @@ ipc.on('load-version', function(arg, val) {
 
         $('section').text('');
         $.each(data, function(i, v) {
-            var input = original_input.clone().val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
+            var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
 
             setInputWidth(input);
         });
@@ -256,7 +266,7 @@ function remove() {
 
     if ($('section input.txt-selected').length == $('section input').length) {
         $('section input.txt-selected').parent().not(':first').remove();
-        $('section input').val('').focus();
+        $('section input').val('').focus().next().text('');
     } else {
         $('section input.txt-selected').parent().remove();
 
@@ -289,13 +299,9 @@ function copy(input) {
 
 function paste(domains, current) {
     $.each(domains, function(i, v) {
-        var input = $(original_input.clone().val(v));
+        var input = $(original_input.clone().removeClass("txt-selected").val(v));
 
-        input = $(input).after("<p>test</p>");
-
-        console.log(input);
-
-        console.log(input[0]);
+        input = $(input);
 
         $(current).parent().after($('<div class="domain-container"/>').html($(input)).append("<span/>"));
 
@@ -311,7 +317,10 @@ $(document).on('keydown', function(e){
 
     // backspace
     if (e.keyCode == 8 || e.keyCode == 46) {
-        remove();
+        if ($('input.txt-selected').length > 0) {
+            e.preventDefault();
+            remove();
+        }
     }
 
     // ctrl+c
@@ -333,23 +342,29 @@ $(document).on('keydown', function(e){
 
     // ctrl+v
     if ((e.ctrlKey || e.metaKey) && e.keyCode == 86) {
-        if ($('input.txt-selected').length == 0) {
+        var text = clipboard.readText();
+
+        if (/\n/.test(text)) {
+            e.preventDefault();
+        } else {
             return;
         }
 
-        e.preventDefault();
-
-        var domains = clipboard.readText().match(/[a-zA-Z0-9\-\.]+\.ge/g)
+        var domains = text.match(/[a-zA-Z0-9\-\.]+\.ge/g)
         if (domains === null || domains.length == 0) {
             return;
         }
 
         remove();
-        paste(domains, $('input:focus'));
+        paste(domains.reverse(), $('input:focus'));
     }
 
     // ctrl+x
     if ((e.ctrlKey || e.metaKey) && e.keyCode == 88) {
+        if ($('input.txt-selected').length == 0) {
+            return;
+        }
+
         var text = copy('input.txt-selected');
 
         if (text.length == 0) {
@@ -360,6 +375,21 @@ $(document).on('keydown', function(e){
         remove();
     }
 
+    // chars
+    var char = String.fromCharCode(event.keyCode);
+    if (char.match(/(\w|\s)/g) && !(e.ctrlKey || e.metaKey)) {
+        if ($('input.txt-selected').length == 0) {
+            return;
+        }
+       remove();
+
+       var input = $(original_input).clone().val('');
+
+       input = $(input);
+
+       $("input:focus").parent().after($('<div class="domain-container"/>').html(input).append("<span/>"));
+       $(input).focus();
+    }
 
     if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
         $('section input').addClass('txt-selected');
@@ -368,73 +398,21 @@ $(document).on('keydown', function(e){
     }
 });
 
-/*var ctrlA = false;
-
-$(document).on('keydown', 'section input', function(e){
-    // only cmd|ctrl
-    if (e.keyCode == 91 || e.keyCode == 17) {
-        return;
-    }
-
-    // Ctrl|cmd+a
-    if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
-        console.log('activate ctrl|cmd+a');
-        ctrlA = true;
-
-        $('section input').addClass('txt-selected');
-
-        return;
-    }
-
-    // Backspace, delete
-    if ((e.keyCode == 8 || e.keyCode == 46) && ctrlA) {
-        // var parent = $('section input.txt-selected').first().parent().prev().find("input").first()
-        // $('section input.txt-selected').parent().remove();
-        // e.preventDefault();
-        // parent.focus();
-        $('section div:not(:first)').remove();
-        $('section input').val('').focus();
-    } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 67) && ctrlA) { // Ctrl|cmd+c
-        e.preventDefault();
-        $('#copy').trigger('click');
-        console.log('copy');
-    } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 86) && ctrlA) { // Ctrl|cmd+v
-        $('#paste').trigger('click');
-        console.log('paste');
-    } else if (((e.ctrlKey || e.metaKey) && e.keyCode == 88) && ctrlA) { // Ctrl|cmd+x
-        e.preventDefault();
-        $('#copy').trigger('click');
-        $('section div:not(:first)').remove();
-        $('section input').val('').focus();
-    } else if (ctrlA) { // any other
-        // If non-special key is pressed
-        var char = String.fromCharCode(event.keyCode);
-        if (char.match(/(\w|\s)/g)) {
-            $('section div:not(:first)').remove();
-            $('section input').val(char).focus();
-        }
-    }
-
-    $('section input').removeClass('txt-selected');
-    ctrlA = false;
-});*/
-
-
 // + mouse
 
 var ds = new DragSelect({
     selectables: document.getElementsByClassName("domain-container"),
-    customStyles: true,
+    //customStyles: true,
     onDragStart: function() {
-        $('section input').removeClass('txt-selected ds');
+        $('section input').removeClass('txt-selected');
         ds.addSelectables(document.getElementsByClassName('domain-container'));
     },
     onDragMove: function(elements) {
-        $('section input').removeClass('txt-selected ds');
+        $('section input').removeClass('txt-selected');
         var selection = ds.getSelection()
         if (selection.length > 1) {
             $(selection).each(function(el){
-                $(this).find("input").addClass('txt-selected ds');
+                $(this).find("input").addClass('txt-selected');
             });
         }
     }
@@ -443,8 +421,9 @@ var ds = new DragSelect({
 // Function to set input width relative to length
 function setInputWidth(input) {
     $(input).css('width', (($(input).val().length + 1) * 9.7) + 'px');
+    //$(input).removeClass("txt-selected");
 }
-$(document).on('keydown','section input',function(e){
+$(document).on('keydown keyup','section input',function(e){
     setInputWidth($(this));
 });
 
