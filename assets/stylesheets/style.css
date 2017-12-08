@@ -5,7 +5,7 @@ body {
     -webkit-user-select:none;
 }
 
-h1, h3 {
+h1, h4 {
     font-family: MarkGEOCAPS-Regular;
 }
 
@@ -14,6 +14,7 @@ h1 span {
     top:10px;
     left:8px;
 }
+
 
 .txt-selected {
     background: #b2d7fe;
@@ -196,4 +197,16 @@ select {
     font-size:11px;
     text-align:right;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+a.github:link, a.github:visited {
+    text-decoration:none;
+    color: #949494;
+}
+a.github:focus, a.github:active, a.github:hover {
+    text-decoration:none;
+    color: #a4a4a4;
+}
+.version {
+    color: #949494;
 }

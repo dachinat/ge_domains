@@ -50,7 +50,25 @@ function createWindow () {
     var template = [{
         label: 'GE Domains',
         submenu: [{
-            label: 'Quit',
+            label: 'შესახებ',
+            click: function() {
+                var aboutWindow = new BrowserWindow({
+                    parent: mainWindow,
+                    modal: true,
+                    width: 350,
+                    height: 250,
+                    show: false,
+                    backgroundColor: '#fffff'
+                });
+
+                aboutWindow.loadURL('file://' + __dirname + '/about.html')
+                aboutWindow.once('ready-to-show', () => {
+                    aboutWindow.show()
+                    aboutWindow.focus()
+                });
+            }
+        }, {
+            label: 'დახურვა',
             accelerator: 'CmdOrCtrl+Q',
             click: function() {
                 app.quit();
@@ -59,29 +77,29 @@ function createWindow () {
     }, {
         label: 'Edit',
         submenu: [{
-            label: 'Undo',
+            label: 'უკან',
             accelerator: 'CmdOrCtrl+Z',
             selector: 'undo:'
         }, {
-            label: 'Redo',
+            label: 'წინ',
             accelerator: 'Shift+CmdOrCtrl+Z',
             selector: 'redo:'
         }, {
             type: 'separator'
         }, {
-            label: 'Cut',
+            label: 'ამოჭრა',
             accelerator: 'CmdOrCtrl+X',
             selector: 'cut:'
         }, {
-            label: 'Copy',
+            label: 'კოპირება',
             accelerator: 'CmdOrCtrl+C',
             selector: 'copy:'
         }, {
-            label: 'Paste',
+            label: 'ჩასმა',
             accelerator: 'CmdOrCtrl+V',
             selector: 'paste:'
         }, {
-            label: 'Select All',
+            label: 'ყველას მონიშვნა',
             accelerator: 'CmdOrCtrl+A',
             selector: 'selectAll:'
         }]

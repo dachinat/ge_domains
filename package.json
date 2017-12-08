@@ -24,7 +24,6 @@
     "electron": "^1.7.9"
   },
   "dependencies": {
-    "dragselect": "^1.7.14",
     "electron-json-storage": "^4.0.2",
     "font-awesome": "^4.7.0",
     "jquery": "^3.2.1"
