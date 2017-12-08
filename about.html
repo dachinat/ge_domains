@@ -24,9 +24,16 @@
     "use strict";
     window.$ = window.jQuery = require('jquery');
     const pkg = require('./package.json');
-    $(".github").attr('href', pkg.repository.url);
-    $(".version").text(pkg.name + ' v' + pkg.version)
-    $(".github-msg").text(pkg.repository.url.split(".")[1].split("/").slice(1).join("/"))
+    const shell = require('electron').shell;
+
+    $('.github').attr('href', pkg.repository.url.split('+')[1]);
+    $('.version').text(pkg.name + ' v' + pkg.version);
+    $('.github-msg').text(pkg.repository.url.split('.')[1].split('/').slice(1).join('/'));
+
+    $(document).on('click', 'a[href^="http"]', function(event) {
+        event.preventDefault();
+        shell.openExternal(this.href);
+    });
 </script>
 
 </body>
