@@ -22,7 +22,7 @@ function createWindow () {
         maximizable: false,
         fullscreenable: false,
         title: 'GE დომენები',
-        icon: path.join(__dirname, 'assets', 'ico', 'ge_domains.png'),
+        icon: path.join(__dirname, 'assets', 'icons', 'ge_domains.png'),
         show: false
     })
 
@@ -60,13 +60,21 @@ function createWindow () {
                         width: 350,
                         height: 280,
                         show: false,
-                        backgroundColor: '#fffff'
+                        backgroundColor: '#fffff',
+                        resizable: false,
+                        maximizable: false,
+                        fullscreenable: false,
+                        minimizable: false
                     });
 
                     aboutWindow.loadURL('file://' + __dirname + '/about.html')
+                    aboutWindow.setMenu(null);
                     aboutWindow.once('ready-to-show', () => {
                         aboutWindow.show()
                         aboutWindow.focus()
+                    });
+                    aboutWindow.on('closed', function() {
+                       aboutWindow = undefined;
                     });
                 }
             }

@@ -194,8 +194,13 @@ $('[data-toggle=history]').click(function(){
                 width: 300,
                 height: 535,
                 show: false,
-                backgroundColor: '#fffff'
+                backgroundColor: '#fffff',
+                resizable: false,
+                maximizable: false,
+                fullscreenable: false,
+                minimizable: false
             });
+            win.setMenu(null);
 
             win.loadURL('file://' + __dirname + '/history.html')
             win.once('ready-to-show', () => {

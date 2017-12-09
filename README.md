@@ -6,7 +6,7 @@ Project is built with help of [Electron](https://electronjs.org/) on top of Node
 
 # Screenshot
 
-![GE Domains Screenshot](https://image.ibb.co/hoxEcw/ge_domains.png "GE Domains Screenshot")
+![GE Domains Screenshot](https://preview.ibb.co/jm0vLG/Screen_Shot_2017_12_09_at_7_22_59_PM.png "GE Domains Screenshot")
 
 # Features
 
