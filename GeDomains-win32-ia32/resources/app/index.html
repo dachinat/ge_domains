@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GE დომენები</title>
+    <link rel="stylesheet" href="./node_modules/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="./assets/stylesheets/style.css"/>
+    <script src="./assets/javascript/ds.min.js"></script>
+</head>
+<body>
+<h1><span>GE დომენების შემოწმება</span></h1>
+
+<div style="margin-top:35px;">
+    <section id="domain-list">
+        <div class="domain-container">
+            <input class="domain-input" />
+            <span></span>
+        </div>
+    </section>
+</div>
+
+<div style="margin-left:22px;margin-top:10px;">
+    <a data-toggle="history" href="#" class="btn_sm gray_sm"><i class="fa fa-history"></i></a>
+    <a id="copy" href="#" class="btn_sm gray_sm"><i class="fa fa-copy"></i> კოპირება</a>
+    <a id="paste" href="#" class="btn_sm gray_sm"><i class="fa fa-paste"></i> ჩასმა</a>
+    <a id="clear" href="#" class="btn_sm gray_sm"><i class="fa fa-remove"></i> გასუფთავება</a>
+</div>
+
+<div id="main-actions">
+    <a id="save" href="#" class="btn gray">დამახსოვრება</a>
+    <a id="check" href="#" class="btn blue">შემოწმება</a>
+</div>
+
+<div id="version"></div>
+
+<script>
+    "use strict";
+    require('./renderer.js')
+</script>
+
+</body>
+</html>

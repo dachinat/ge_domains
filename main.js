@@ -21,8 +21,8 @@ function createWindow () {
         resizable: false,
         maximizable: false,
         fullscreenable: false,
-        title: 'GE დომენები (BETA)',
-        icon: path.join(__dirname, 'assets', 'icons', 'ge_domains.png'),
+        title: 'GE დომენები',
+        icon: path.join(__dirname, 'assets', 'ico', 'ge_domains.png'),
         show: false
     })
 
@@ -32,7 +32,7 @@ function createWindow () {
         slashes: true
     }))
 
-    mainWindow.webContents.openDevTools()
+    //mainWindow.webContents.openDevTools()
 
     mainWindow.on('closed', function () {
         mainWindow = null
@@ -47,25 +47,28 @@ function createWindow () {
         mainWindow.webContents.send('load-version', arg);
     });
 
+    var aboutWindow;
     var template = [{
         label: 'GE Domains',
         submenu: [{
             label: 'შესახებ',
             click: function() {
-                var aboutWindow = new BrowserWindow({
-                    parent: mainWindow,
-                    modal: true,
-                    width: 350,
-                    height: 250,
-                    show: false,
-                    backgroundColor: '#fffff'
-                });
+                if (typeof aboutWindow === "undefined") {
+                    aboutWindow = new BrowserWindow({
+                        parent: mainWindow,
+                        modal: true,
+                        width: 350,
+                        height: 280,
+                        show: false,
+                        backgroundColor: '#fffff'
+                    });
 
-                aboutWindow.loadURL('file://' + __dirname + '/about.html')
-                aboutWindow.once('ready-to-show', () => {
-                    aboutWindow.show()
-                    aboutWindow.focus()
-                });
+                    aboutWindow.loadURL('file://' + __dirname + '/about.html')
+                    aboutWindow.once('ready-to-show', () => {
+                        aboutWindow.show()
+                        aboutWindow.focus()
+                    });
+                }
             }
         }, {
             label: 'დახურვა',
