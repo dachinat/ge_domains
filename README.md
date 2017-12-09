@@ -22,6 +22,7 @@ You can download executables for different systems on [v1.3.0 release page](http
 * Clear input area
 * Easy navigation with keyboard arrows
 * Select inputs to clear, cut, copy or paste to
+* Retrieve information on an unavailable domain
 
 ## Contributing
 
