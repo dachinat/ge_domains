@@ -31,11 +31,23 @@ $(document).on('keypress', 'section input',function(e){
 });
 
 let firstBackspace = false;
+
+// Fix for "enter (to create new input) and backspace to go to previous input [needed double backspace]"
+$(document).on('keydown','section input',function(e){
+    if (e.keyCode == 8) {
+        if ($(this).val().length == 0) {
+            firstBackspace = true;
+        }
+    }
+});
+
 $(document).on('keyup','section input',function(e){
     // When backspace is pressed in input
     if (e.keyCode == 8) {
         // When caret is in the beginning of input
         if ($(this).get(0).selectionStart === 0) {
+            console.log($(this).val());
+
             if (firstBackspace === false) {
                 firstBackspace = true;
                 return;
