@@ -275,8 +275,6 @@ ipc.on('load-version', function(arg, val) {
         $('section').text('');
         $.each(data, function(i, v) {
             var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
-
-            setInputWidth(input);
         });
     });
 });
@@ -344,7 +342,13 @@ function copy(input) {
                     domain += '.ge';
                 }
 
-                var status = $(el).next().text()
+                var status = $(el).next().text();
+
+                var match = status.match(/\S+/)
+                if (match !== null) {
+                    status = match[0];
+                }
+
                 domain += (status.length > 0) ? ' (' + status + ')' : '';
                 return domain;
             }
@@ -359,8 +363,6 @@ function paste(domains, current) {
         input = $(input);
 
         $(current).parent().after($('<div class="domain-container"/>').html($(input)).append("<span/>"));
-
-        setInputWidth($(current).parent().next().find("input"));
     });
 }
 
@@ -447,7 +449,7 @@ $(document).on('keydown', function(e){
     }
 
     if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
-        $('section input').addClass('txt-selected');
+        $('section input').addClass('txt-selected').blur();
     } else {
         $('section input').removeClass('txt-selected');
     }
@@ -472,15 +474,6 @@ var ds = new DragSelect({
             });
         }
     }
-});
-
-// Function to set input width relative to length
-function setInputWidth(input) {
-    $(input).css('width', (($(input).val().length + 1) * 14) + 'px');
-    //$(input).removeClass("txt-selected");
-}
-$(document).on('keyup keydown','section input',function(e){
-    setInputWidth($(this));
 });
 
 // Store original input state
