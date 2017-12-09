@@ -30,11 +30,16 @@ $(document).on('keypress', 'section input',function(e){
     }
 });
 
+let firstBackspace = false;
 $(document).on('keyup','section input',function(e){
     // When backspace is pressed in input
     if (e.keyCode == 8) {
         // When caret is in the beginning of input
         if ($(this).get(0).selectionStart === 0) {
+            if (firstBackspace === false) {
+                firstBackspace = true;
+                return;
+            }
 
             // Focus on previous input
             if ($(this).parent().prev().find('input').length > 0) {
@@ -49,6 +54,7 @@ $(document).on('keyup','section input',function(e){
                 $(this).parent().remove();
             }
 
+            firstBackspace = false;
             // When caret is in the end of input
         } else if ($(this).get(0).selectionStart === $(this).val().length) {
             // Clear status

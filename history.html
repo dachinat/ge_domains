@@ -49,12 +49,12 @@
             var key = $.trim($(element).parent().text());
             storage.remove(key, function(error) {
                 if (error) throw error;
-            });
 
-            // close if empty
-            if ($('ul li').length == 0) {
-                window.close();
-            }
+                // close if empty
+                if ($('ul li').length == 0) {
+                    window.close();
+                }
+            });
         }
     })
 
