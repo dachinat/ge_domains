@@ -6,11 +6,11 @@ Project is built with help of [Electron](https://electronjs.org/) on top of Node
 
 ## Screenshot
 
-![GE Domains Screenshot](https://image.ibb.co/em0O7w/ge_domains.png "GE Domains Screenshot")
+![GE Domains Screenshot](https://image.ibb.co/eQNv4b/ge_domains.png "GE Domains Screenshot")
 
 ## Download executables
 
-You can download executables for different systems on [v1.2.4 release page](https://github.com/dachinat/ge_domains/releases/tag/v1.2.4)
+You can download executables for different systems on [v1.3.0 release page](https://github.com/dachinat/ge_domains/releases/tag/v1.3.0)
 
 ## Features
 
