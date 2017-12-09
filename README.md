@@ -10,7 +10,7 @@ Project is built with help of [Electron](https://electronjs.org/) on top of Node
 
 ## Download executables
 
-You can download executables for different systems on [v1.3.0 release page](https://github.com/dachinat/ge_domains/releases/tag/v1.3.0)
+You can download executables for different systems on [v1.3.1 release page](https://github.com/dachinat/ge_domains/releases/tag/v1.3.1)
 
 ## Features
 
