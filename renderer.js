@@ -46,8 +46,6 @@ $(document).on('keyup','section input',function(e){
     if (e.keyCode == 8) {
         // When caret is in the beginning of input
         if ($(this).get(0).selectionStart === 0) {
-            console.log($(this).val());
-
             if (firstBackspace === false) {
                 firstBackspace = true;
                 return;
@@ -131,8 +129,11 @@ function checkDomain(input) {
         },
         success: function (data, textStatus, jqXHR) {
             var msg = /დაკავებულია/.test(data['Data']) ?
-                '<span class="text-red">დაკავებულია</span>' : /არასწორი დომენური სახელი/.test(data['Data']) ?
-                    '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+                '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
+                '<span class="i" style="display:none;">' +
+                domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
+                    /არასწორი დომენური სახელი/.test(data['Data']) ?
+                        '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
 
             input.next().html(msg);
 
@@ -140,6 +141,37 @@ function checkDomain(input) {
         }
     });
 }
+
+// When info button is pressed
+$(document).on('click','.info',function(e){
+    e.preventDefault();
+
+    var infoWindow = new BrowserWindow({
+        parent: remote.getCurrentWindow(),
+        modal: true,
+        width: 400,
+        height: 500,
+        show: false,
+        backgroundColor: '#fffff',
+        resizable: false,
+        maximizable: false,
+        fullscreenable: false,
+        minimizable: false
+    });
+    //infoWindow.webContents.openDevTools()
+
+    infoWindow.setMenu(null);
+
+    infoWindow.loadURL('file://' + __dirname + '/info.html')
+
+    infoWindow.once('ready-to-show', () => {
+        infoWindow.show()
+        infoWindow.focus()
+
+        infoWindow.webContents.send('show-info', $(this).parent().find('.i').html());
+
+    });
+});
 
 // When check button is clicked
 $('#check').on('click', function(){
@@ -444,10 +476,10 @@ var ds = new DragSelect({
 
 // Function to set input width relative to length
 function setInputWidth(input) {
-    $(input).css('width', (($(input).val().length + 1) * 9.7) + 'px');
+    $(input).css('width', (($(input).val().length + 1) * 14) + 'px');
     //$(input).removeClass("txt-selected");
 }
-$(document).on('keydown keyup','section input',function(e){
+$(document).on('keyup keydown','section input',function(e){
     setInputWidth($(this));
 });
 

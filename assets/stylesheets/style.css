@@ -210,3 +210,15 @@ a.github:focus, a.github:active, a.github:hover {
 .version {
     color: #949494;
 }
+
+a.info:link, a.info:visited, a.info:focus, a.info:active, a.info:hover {
+    text-decoration:none;
+    color: #2d527c;
+}
+
+#info {
+    color: #4b4b4b;
+    word-wrap:break-word;
+    overflow:auto;
+    height:300px;
+}

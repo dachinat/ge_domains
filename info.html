@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./assets/stylesheets/style.css"/>
+</head>
+<body>
+
+<h4>ინფორმაცია დომენზე</h4>
+
+<div style="margin:15px;background:#fff;">
+    <div id="info">
+    </div>
+
+    <div style="text-align:center;margin-top:25px;">
+        <a href="javascript:window.close();" class="btn_sm blue_sm">დაბრუნება</a>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+    window.$ = window.jQuery = require('jquery');
+
+    const ipc = require('electron').ipcRenderer;
+
+    ipc.on('show-info', function(event, arg){
+       $('#info').html(arg);
+    });
+</script>
+
+</body>
+</html>
