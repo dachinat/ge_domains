@@ -422,6 +422,7 @@ var ds = new DragSelect({
         $('section input').removeClass('txt-selected');
         var selection = ds.getSelection()
         if (selection.length > 1) {
+            $('section input').blur();
             $(selection).each(function(el){
                 $(this).find("input").addClass('txt-selected');
             });
