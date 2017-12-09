@@ -1,6 +1,6 @@
 {
   "name": "ge_domains",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Check for multiple .GE domains at a time",
   "main": "main.js",
   "scripts": {
