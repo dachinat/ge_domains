@@ -38,6 +38,8 @@ $(document).on('keydown','section input',function(e){
         if ($(this).val().length == 0) {
             firstBackspace = true;
         }
+    } else {
+        firstBackspace = false;
     }
 });
 
