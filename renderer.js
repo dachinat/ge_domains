@@ -130,12 +130,14 @@ function checkDomain(input) {
             'X-Requested-With': 'XMLHttpRequest'
         },
         success: function (data, textStatus, jqXHR) {
+            console.log(data['Data']);
+
             var msg = /დაკავებულია/.test(data['Data']) ?
                 '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
                 '<span class="i" style="display:none;">' +
                 domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
-                    /არასწორი დომენური სახელი/.test(data['Data']) ?
-                        '<span class="text-red">სახელი არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+                    /არასწორი/.test(data['Data']) ?
+                        '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
 
             input.next().html(msg);
 
