@@ -358,22 +358,6 @@ function copy(input) {
     ).join("\n");
 }
 
-function paste(domains, current) {
-    $.each(domains, function(i, v) {
-        var input = $(original_input.clone().removeClass("txt-selected").val(v));
-
-        input = $(input);
-
-        var new_container = $('<div class="domain-container"/>').html($(input)).append("<span/>");
-
-        current(new_container);
-
-        //if (i === 0) {
-          //  input.focus();
-        //}
-    });
-}
-
 $(document).on('keydown', function(e){
     // ctrl|cmd
     if (e.keyCode == 91 || e.keyCode == 17) {
@@ -423,10 +407,17 @@ $(document).on('keydown', function(e){
         var txtSelected = $("section input.txt-selected");
 
         if ($(txtSelected).length == 0) {
-            domains = domains.reverse();
+           //domains = domains.reverse();
         }
 
-        paste(domains, function(new_container) {
+        // paste
+        $.each(domains, function(i, v) {
+            var input = $(original_input.clone().removeClass("txt-selected").val(v));
+
+            input = $(input);
+
+            var new_container = $('<div class="domain-container"/>').html($(input)).append("<span/>");
+
             if ($(txtSelected).length > 0) {
                 console.log(txtSelected);
                 var el = $(txtSelected).first().parent().prev();
@@ -439,6 +430,8 @@ $(document).on('keydown', function(e){
             } else {
                 $("input:focus").parent().after(new_container);
             }
+
+            $(input).focus();
         });
 
         remove();
