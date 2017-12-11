@@ -25,7 +25,16 @@ $(document).on('keypress', 'section input',function(e){
         if ($(this).val().length < 2 || !/^[A-Za-z0-9\-\.]+$/.test($(this).val())) {
             return;
         }
-        original_input.clone().removeClass("txt-selected").val('').appendTo($(this).parent().parent()).wrap('<div class="domain-container"/>').after('<span/>').focus();
+        //original_input.clone().removeClass("txt-selected").val('').appendTo($(this).parent().parent()).wrap('<div class="domain-container"/>').after('<span/>').focus();
+
+        var input = $(original_input.clone().removeClass("txt-selected").val(''));
+        input = $(input);
+        var new_container = $('<div class="domain-container"/>').html($(input)).append("<span/>");
+        $(this).parent().after(new_container);
+        $(input).focus();
+
+        remove();
+
         checkDomain($(this));
     }
 });
@@ -35,7 +44,7 @@ let firstBackspace = false;
 // Fix for "enter (to create new input) and backspace to go to previous input [needed double backspace]"
 $(document).on('keydown','section input',function(e){
     if (e.keyCode == 8) {
-        if ($(this).val().length == 0) {
+        if ($(this).get(0).selectionStart === 0) {
             firstBackspace = true;
         }
     } else {
@@ -57,12 +66,13 @@ $(document).on('keyup','section input',function(e){
             if ($(this).parent().prev().find('input').length > 0) {
                 $(this).parent().prev().find('input').focus();
             } else {
+                console.log('here');
                 // Fix when second input with empty value exists
-                $("section input").focus();
+                $("section input:eq(1)").focus();
             }
 
             // Delete surrunding divs for all except first input
-            if ($(this).val() == '' && $($(this).parent().parent().children()).length > 1) {
+            if ($(this).val() == '' && $($(this).parent().parent().children()).length > 2) { // 2 for ds.selectable
                 $(this).parent().remove();
             }
 
@@ -119,29 +129,29 @@ function checkDomain(input) {
 
     input.next().text('მოწმდება...')
 
-    // $.ajax({
-    //     url: 'http://nic.net.ge/Home/DomainCheck',
-    //     type: 'post',
-    //     data: {
-    //         'Domain': domain,
-    //         'TopLevelDomain': '.ge'
-    //     },
-    //     headers: {
-    //         'X-Requested-With': 'XMLHttpRequest'
-    //     },
-    //     success: function (data, textStatus, jqXHR) {
-    //         var msg = /დაკავებულია/.test(data['Data']) ?
-    //             '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
-    //             '<span class="i" style="display:none;">' +
-    //             domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
-    //                 /არასწორი/.test(data['Data']) ?
-    //                     '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
-    //
-    //         input.next().html(msg);
-    //
-    //         store[domain] = [+new Date(), msg];
-    //     }
-    // });
+    $.ajax({
+        url: 'http://nic.net.ge/Home/DomainCheck',
+        type: 'post',
+        data: {
+            'Domain': domain,
+            'TopLevelDomain': '.ge'
+        },
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function (data, textStatus, jqXHR) {
+            var msg = /დაკავებულია/.test(data['Data']) ?
+                '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
+                '<span class="i" style="display:none;">' +
+                domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
+                    /არასწორი/.test(data['Data']) ?
+                        '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+
+            input.next().html(msg);
+
+            store[domain] = [+new Date(), msg];
+        }
+    });
 }
 
 // When info button is pressed
@@ -410,7 +420,7 @@ $(document).on('keydown', function(e){
            //domains = domains.reverse();
         }
 
-        // paste
+        // paste func
         $.each(domains, function(i, v) {
             var input = $(original_input.clone().removeClass("txt-selected").val(v));
 
