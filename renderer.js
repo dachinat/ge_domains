@@ -446,7 +446,8 @@ $(document).on('keydown', function(e){
 
        input = $(input);
 
-       $("input:focus").parent().after($('<div class="domain-container"/>').html(input).append("<span/>"));
+       $("input:focus").parent().before($('<div class="domain-container"/>').html(input).append("<span/>"));
+
        $(input).focus();
     }
 
