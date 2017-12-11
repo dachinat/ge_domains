@@ -440,15 +440,23 @@ $(document).on('keydown', function(e){
         if ($('input.txt-selected').length == 0) {
             return;
         }
-       remove();
 
-       var input = $(original_input).clone().val('');
+        var prev = $("section input.txt-selected").first().parent().prev();
 
-       input = $(input);
+        remove();
 
-       $("input:focus").parent().before($('<div class="domain-container"/>').html(input).append("<span/>"));
+        var input = $(original_input).clone().val('');
+        input = $(input);
 
-       $(input).focus();
+        var new_container = $('<div class="domain-container"/>').html(input).append("<span/>")
+
+        if (prev.length > 0) {
+            $(prev).after(new_container);
+        } else {
+            $("section input").first().parent().before(new_container);
+        }
+
+        $(input).focus();
     }
 
     if ((e.ctrlKey || e.metaKey) && e.keyCode == 65) {
