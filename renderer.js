@@ -119,31 +119,29 @@ function checkDomain(input) {
 
     input.next().text('მოწმდება...')
 
-    $.ajax({
-        url: 'http://nic.net.ge/Home/DomainCheck',
-        type: 'post',
-        data: {
-            'Domain': domain,
-            'TopLevelDomain': '.ge'
-        },
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        success: function (data, textStatus, jqXHR) {
-            console.log(data['Data']);
-
-            var msg = /დაკავებულია/.test(data['Data']) ?
-                '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
-                '<span class="i" style="display:none;">' +
-                domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
-                    /არასწორი/.test(data['Data']) ?
-                        '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
-
-            input.next().html(msg);
-
-            store[domain] = [+new Date(), msg];
-        }
-    });
+    // $.ajax({
+    //     url: 'http://nic.net.ge/Home/DomainCheck',
+    //     type: 'post',
+    //     data: {
+    //         'Domain': domain,
+    //         'TopLevelDomain': '.ge'
+    //     },
+    //     headers: {
+    //         'X-Requested-With': 'XMLHttpRequest'
+    //     },
+    //     success: function (data, textStatus, jqXHR) {
+    //         var msg = /დაკავებულია/.test(data['Data']) ?
+    //             '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
+    //             '<span class="i" style="display:none;">' +
+    //             domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
+    //                 /არასწორი/.test(data['Data']) ?
+    //                     '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+    //
+    //         input.next().html(msg);
+    //
+    //         store[domain] = [+new Date(), msg];
+    //     }
+    // });
 }
 
 // When info button is pressed
@@ -463,12 +461,15 @@ $(document).on('keydown', function(e){
 
 var ds = new DragSelect({
     selectables: document.getElementsByClassName("domain-container"),
+    area: $('section')[0],
+    autoScrollSpeed:5,
     //customStyles: true,
     onDragStart: function() {
         $('section input').removeClass('txt-selected');
         ds.addSelectables(document.getElementsByClassName('domain-container'));
     },
     onDragMove: function(elements) {
+        console.log('test');
         $('section input').removeClass('txt-selected');
         var selection = ds.getSelection()
         if (selection.length > 1) {
@@ -478,6 +479,9 @@ var ds = new DragSelect({
             });
         }
     }
+});
+$(document).on('mouseup', function(){
+    ds.reset();
 });
 
 // Store original input state
