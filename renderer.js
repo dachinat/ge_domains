@@ -364,7 +364,13 @@ function paste(domains, current) {
 
         input = $(input);
 
-        $(current).parent().after($('<div class="domain-container"/>').html($(input)).append("<span/>"));
+        var new_container = $('<div class="domain-container"/>').html($(input)).append("<span/>");
+
+        current(new_container);
+
+        //if (i === 0) {
+          //  input.focus();
+        //}
     });
 }
 
@@ -414,8 +420,28 @@ $(document).on('keydown', function(e){
             return;
         }
 
+        var txtSelected = $("section input.txt-selected");
+
+        if ($(txtSelected).length == 0) {
+            domains = domains.reverse();
+        }
+
+        paste(domains, function(new_container) {
+            if ($(txtSelected).length > 0) {
+                console.log(txtSelected);
+                var el = $(txtSelected).first().parent().prev();
+                console.log(el);
+                if ($(el).length > 0) {
+                    $(el).after(new_container);
+                } else {
+                    $("section input").first().parent().before(new_container);
+                }
+            } else {
+                $("input:focus").parent().after(new_container);
+            }
+        });
+
         remove();
-        paste(domains.reverse(), $('input:focus'));
     }
 
     // ctrl+x
