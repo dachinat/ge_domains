@@ -19,6 +19,9 @@ h1 span {
 .txt-selected {
     background: #b2d7fe;
 }
+.txt-found {
+    background: #ecf8ff;
+}
 
 .btn {
     border-radius: 5px;
@@ -146,6 +149,17 @@ input {
     border: 0px;
     outline: 0px;
     max-width:250px;
+}
+
+input#find {
+    padding:5px;
+    font-family: MarkGEO-Regular;
+    font-size:15px;
+    border-bottom: 1px dashed #2d527c;
+    outline: 0px;
+    background: #ecf8ff;
+    min-width:calc(100% - 20px);
+    margin:10px;
 }
 
 select {

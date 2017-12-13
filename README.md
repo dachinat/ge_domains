@@ -24,6 +24,7 @@ You can download executables for different systems on [v1.3.1 release page](http
 * Select inputs to clear, cut, copy or paste to
 * Retrieve information on an unavailable domain
 * Add/remove/show favorite names
+* Search through inputted names with *ctrl+f* or *cmd+f*
 
 ## Contributing
 

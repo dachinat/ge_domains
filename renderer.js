@@ -343,6 +343,34 @@ function replaceRecords(data, callback=null) {
     });
 }
 
+// When find window sends query
+ipc.on('find-query', function(arg, val){
+    var found, focused;
+    $("input.txt-found").removeClass('txt-found');
+    $("section input").each(function(i, el){
+       if ($(el).val() == val) {
+           if (focused !== 1) {
+               $(el).focus();
+           }
+           $(el).addClass('txt-found');
+           found = 1;
+           focused = 1;
+           return;
+       } else if ((i + 1) == $("section input").length && found !== 1) {
+           $("section input").each(function(i2, el2){
+               if ($(el2).val().indexOf(val) !== -1) {
+                   $(el2).addClass('txt-found');
+                   if (focused !== 1) {
+                       $(el2).focus();
+                   }
+                   focused = 1;
+                   return;
+               }
+           })
+       }
+    });
+});
+
 // When child window sends selected version
 ipc.on('load-version', function(arg, val) {
     storage.get(val, function(error, data) {
@@ -549,6 +577,32 @@ $(document).on('keydown', function(e){
         remove();
     }
 
+    // ctrl+f
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == 70) {
+        var findWindow = new BrowserWindow({
+            parent: remote.getCurrentWindow(),
+            modal: true,
+            width: 350,
+            height: 245,
+            show: false,
+            backgroundColor: '#fffff',
+            resizable: false,
+            maximizable: false,
+            fullscreenable: false,
+            minimizable: false
+        });
+        //findWindow.webContents.openDevTools()
+
+        findWindow.setMenu(null);
+
+        findWindow.loadURL('file://' + __dirname + '/find.html')
+
+        findWindow.once('ready-to-show', () => {
+            findWindow.show()
+            findWindow.focus()
+        });
+    }
+
     // chars
     var char = String.fromCharCode(event.keyCode);
     if (char.match(/(\w|\s)/g) && !(e.ctrlKey || e.metaKey)) {
@@ -606,6 +660,10 @@ var ds = new DragSelect({
 });
 $(document).on('mouseup', function(){
     ds.reset();
+});
+
+$(document).on('click mousedown keydown', function(){
+   $("input.txt-found").removeClass('txt-found');
 });
 
 // Store original input state
