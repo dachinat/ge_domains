@@ -333,10 +333,13 @@ $('[data-toggle=history]').click(function(){
     });
 });
 
-function replaceRecords(data) {
+function replaceRecords(data, callback=null) {
     $('section').text('');
     $.each(data, function(i, v) {
         var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
+        if (callback) {
+            callback(v, input);
+        }
     });
 }
 
@@ -364,7 +367,11 @@ $('#favorites').on('click', function(e){
           return;
       }
 
-      replaceRecords(data);
+      replaceRecords(data, function(domain, input){
+        $(input).parent().find("span").html('<span class="status-for" status-for="'+domain+'">' +
+            '&nbsp;<a class="fav" href="#"><i class="fa fa-star"></i></a>' +
+            '</span>');
+      });
    });
 });
 
