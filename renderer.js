@@ -371,6 +371,8 @@ $('#favorites').on('click', function(e){
         $(input).parent().find("span").html('<span class="status-for" status-for="'+domain+'">' +
             '&nbsp;<a class="fav" href="#"><i class="fa fa-star"></i></a>' +
             '</span>');
+
+        $(input).parent().find(".fav").data("lock", true);
       });
    });
 });
