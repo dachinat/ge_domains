@@ -67,6 +67,9 @@
         }
 
         $.each(data, function(i){
+            if (i === 'favorites') {
+                return;
+            }
             $('<a>').attr('href','#').html('<i class="fa fa-file-o"></i> ' + i).appendTo($('<li/>').appendTo($('ul'))).before('<a class="txt-red" href="#delete" style="float:right;"><i class="fa fa-remove"></i></a>');
         });
     });

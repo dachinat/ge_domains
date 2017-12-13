@@ -122,6 +122,15 @@ function checkDomain(input) {
 
         if (Math.floor((now - store[domain][0]) / 1000) <= SEC_LIMIT) {
             input.next().html(store[domain][1]);
+
+            storage.get('favorites', function (error, data)  {
+                if (data.length > 0) {
+                    if (data.includes(store[domain][2])) {
+                        $('[status-for='+domain+']').find('.fav').trigger('mouseover').data('lock', true);
+                    }
+                }
+            });
+
             return;
         }
         delete store[domain];
@@ -140,19 +149,69 @@ function checkDomain(input) {
             'X-Requested-With': 'XMLHttpRequest'
         },
         success: function (data, textStatus, jqXHR) {
+            var star = '&nbsp;<a class="fav" href="#"><i class="fa fa-star-o"></i></a>';
+
             var msg = /დაკავებულია/.test(data['Data']) ?
                 '<span class="text-red">დაკავებულია <a class="info" href="#"><i class="fa fa-info-circle"></i></a>' +
-                '<span class="i" style="display:none;">' +
+                star + '<span class="i" style="display:none;">' +
                 domain + '.ge<br/><br/>' + $(data['Data']).find("div.info").html() + '</span></span>' :
                     /არასწორი/.test(data['Data']) ?
-                        '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია</span>';
+                        '<span class="text-red">არასწორია</span>' : '<span class="text-blue">თავისუფალია' +
+                        star + '</span>';
+
+            msg = '<span class="status-for" status-for="'+domain+'">' + msg + '</span>';
 
             input.next().html(msg);
 
-            store[domain] = [+new Date(), msg];
+            storage.get('favorites', function (error, data)  {
+                if (data.length > 0) {
+                    if (data.includes(domain)) {
+                       $('[status-for='+domain+']').find('.fav').trigger('mouseover').data('lock', true);
+                    }
+                }
+            });
+
+            store[domain] = [+new Date(), msg, domain];
         }
     });
 }
+
+// Fav icon
+
+$(document).on('mouseover', '.fav', function(){
+   $(this).find('.fa').removeClass('fa-star-o').addClass('fa-star');
+});
+$(document).on('mouseout', '.fav', function(){
+    if ($(this).data('lock') == true) {
+        return;
+    }
+    $(this).find('.fa').removeClass('fa-star').addClass('fa-star-o');
+});
+$(document).on('click', '.fav', function(){
+    var domain = $(this).closest('.status-for').attr('status-for');
+    var domains = $('[status-for='+domain+']');
+
+    storage.get('favorites', function(error, data){
+        data = Array.from(data);
+
+        if (data.includes(domain)) {
+            data = data.filter(e => e !== domain);
+
+            $(domains).each(function(i, e){
+                $(e).find('.fav').data('lock', false);
+                $(e).find('.fav').trigger('mouseout');
+            });
+        } else {
+            data.push(domain);
+
+            $(domains).each(function(i, e){
+                $(e).find('.fav').data('lock', true);
+                $(e).find('.fav').trigger('mouseover');
+            });
+        }
+        storage.set('favorites', data);
+    });
+});
 
 // When info button is pressed
 $(document).on('click','.info',function(e){
@@ -263,6 +322,7 @@ $('[data-toggle=history]').click(function(){
                 minimizable: false
             });
             win.setMenu(null);
+            //win.webContents.openDevTools();
 
             win.loadURL('file://' + __dirname + '/history.html')
             win.once('ready-to-show', () => {
@@ -272,6 +332,13 @@ $('[data-toggle=history]').click(function(){
         }
     });
 });
+
+function replaceRecords(data) {
+    $('section').text('');
+    $.each(data, function(i, v) {
+        var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
+    });
+}
 
 // When child window sends selected version
 ipc.on('load-version', function(arg, val) {
@@ -284,11 +351,21 @@ ipc.on('load-version', function(arg, val) {
             return;
         }
 
-        $('section').text('');
-        $.each(data, function(i, v) {
-            var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
-        });
+        replaceRecords(data);
     });
+});
+
+// When favorites button is clicked
+$('#favorites').on('click', function(e){
+   storage.get('favorites', function(error, data) {
+      if (error) throw error;
+
+      if (data.length == 0) {
+          return;
+      }
+
+      replaceRecords(data);
+   });
 });
 
 // When save butotn is clicked

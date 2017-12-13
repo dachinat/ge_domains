@@ -142,7 +142,7 @@ input {
     padding:5px;
     font-family: MarkGEO-Regular;
     font-size:15px;
-    width: 250px;
+    width: 220px;
     border: 0px;
     outline: 0px;
     max-width:250px;
@@ -184,7 +184,7 @@ select {
 }
 
 #main-actions {
-    margin-left: 30px;
+    margin-left: 10px;
     margin-top: 40px;
     display:block;
 }
@@ -216,6 +216,10 @@ a.info:link, a.info:visited, a.info:focus, a.info:active, a.info:hover {
     color: #2d527c;
 }
 
+a.fav:link, a.fav:visited, a.fav:focus, a.fav:active, a.fav:hover {
+    text-decoration:none;
+    color: #2d527c;
+}
 #info {
     color: #4b4b4b;
     word-wrap:break-word;

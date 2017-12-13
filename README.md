@@ -23,6 +23,7 @@ You can download executables for different systems on [v1.3.1 release page](http
 * Easy navigation with keyboard arrows
 * Select inputs to clear, cut, copy or paste to
 * Retrieve information on an unavailable domain
+* Add/remove/show favorite names
 
 ## Contributing
 
