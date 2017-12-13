@@ -334,13 +334,14 @@ $('[data-toggle=history]').click(function(){
 });
 
 function replaceRecords(data, callback=null) {
-    $('section').text('');
+    $('section').find(".domain-container:not(:first)").remove();
     $.each(data, function(i, v) {
         var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
         if (callback) {
             callback(v, input);
         }
     });
+    $('section').find(".domain-container:first").remove();
 }
 
 // When find window sends query
