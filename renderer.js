@@ -66,7 +66,6 @@ $(document).on('keyup','section input',function(e){
             if ($(this).parent().prev().find('input').length > 0) {
                 $(this).parent().prev().find('input').focus();
             } else {
-                console.log('here');
                 // Fix when second input with empty value exists
                 $("section input:eq(1)").focus();
             }
@@ -306,7 +305,7 @@ $('#clear').click(function(){
 $('[data-toggle=history]').click(function(){
     storage.getAll(function(error, data) {
         if (error) throw error;
-        if ($.isEmptyObject(data)) {
+        if ($.isEmptyObject(data) || (Object.keys(data).length == 1 && data.hasOwnProperty("favorites"))) {
             ipc.send('open-error-dialog-history')
         } else {
             var win = new BrowserWindow({
@@ -334,6 +333,10 @@ $('[data-toggle=history]').click(function(){
 });
 
 function replaceRecords(data, callback=null) {
+    if ($.isEmptyObject(data)) {
+        return;
+    }
+
     $('section').find(".domain-container:not(:first)").remove();
     $.each(data, function(i, v) {
         var input = original_input.clone().removeClass("txt-selected").val(v).appendTo('section').wrap('<div class="domain-container"/>').after('<span/>');
@@ -341,6 +344,8 @@ function replaceRecords(data, callback=null) {
             callback(v, input);
         }
     });
+
+    $('section').find('input').focus();
     $('section').find(".domain-container:first").remove();
 }
 
@@ -391,10 +396,6 @@ ipc.on('load-version', function(arg, val) {
 $('#favorites').on('click', function(e){
    storage.get('favorites', function(error, data) {
       if (error) throw error;
-
-      if (data.length == 0) {
-          return;
-      }
 
       replaceRecords(data, function(domain, input){
         $(input).parent().find("span").html('<span class="status-for" status-for="'+domain+'">' +
@@ -544,9 +545,7 @@ $(document).on('keydown', function(e){
             var new_container = $('<div class="domain-container"/>').html($(input)).append("<span/>");
 
             if ($(txtSelected).length > 0) {
-                console.log(txtSelected);
                 var el = $(txtSelected).first().parent().prev();
-                console.log(el);
                 if ($(el).length > 0) {
                     $(el).after(new_container);
                 } else {
@@ -648,7 +647,6 @@ var ds = new DragSelect({
         ds.addSelectables(document.getElementsByClassName('domain-container'));
     },
     onDragMove: function(elements) {
-        console.log('test');
         $('section input').removeClass('txt-selected');
         var selection = ds.getSelection()
         if (selection.length > 1) {
